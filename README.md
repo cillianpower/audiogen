@@ -70,7 +70,9 @@ A few quirks worth knowing:
 
 ## Installation
 
-To be written up once notarised
+Download the latest `Audiogen-<version>-arm64.zip` from the [Releases](https://github.com/cillianpower/audiogen/releases) page, unzip it and move Audiogen to your Applications folder. It's signed and notarised by Apple, so it opens like any other app.
+
+Audiogen doesn't come with models. Open **Settings › Runtimes** and download the ones you want; Stable Audio 3 Small is a good first one.
 
 
 ## Licences
@@ -82,20 +84,19 @@ The models are made by other people and come with their own licences, which appl
 
 You need an Apple Silicon Mac running macOS 27 or later, and enough free disk space for the models you want (see the table above).
 
-There's no signed download yet, so you build it yourself. That needs Xcode and CMake:
+To build it yourself you need Xcode and CMake:
 
 ```sh
 scripts/build-app.sh
 open build/Audiogen.app
 ```
 
-The build script compiles the bundled MiniMax runtime, then the app, and signs it ad hoc for your own Mac. Notarisation is still to do before it can be handed to other people.
+The build script compiles the bundled MiniMax runtime, then the app, and signs it ad hoc for your own Mac. `scripts/release.sh` makes a Developer ID signed, notarised build for distribution; it needs a Developer ID certificate and an Apple account signed into Xcode.
 
 ## Status
 
 This is version 0.4 and still rough in places. Things that are known and not yet done:
 
-- No notarised release.
 - ACE-Step can't cancel a render on a server it didn't start; the result is just discarded.
 - Only some model sizes have been checked with real renders. Others are installed and checksum-verified, but not yet tested by ear.
 
