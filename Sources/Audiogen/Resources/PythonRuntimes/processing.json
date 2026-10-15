@@ -1,0 +1,188 @@
+{
+  "runtimes": [
+    {
+      "id": "sam",
+      "revision": "70f4add32911bab6f869b824864ad9f1e24dcb97",
+      "repository": {
+        "name": "sam.tar.gz",
+        "url": "https://codeload.github.com/Blaizzy/mlx-audio/tar.gz/70f4add32911bab6f869b824864ad9f1e24dcb97",
+        "sha256": "db40905affdb20c003380e151d4a750251f2b458ba2d6b86c368de751f0522af",
+        "bytes": 7053532
+      },
+      "repositoryDirectory": "mlx-audio-70f4add32911bab6f869b824864ad9f1e24dcb97",
+      "workingSubdirectory": ".",
+      "models": [
+        {
+          "id": "small",
+          "name": "Small",
+          "minimumMemoryGB": 16,
+          "steps": 16,
+          "files": [
+            {
+              "name": "small/config.json",
+              "url": "https://huggingface.co/mlx-community/sam-audio-small/resolve/4ca84acc5c47f64bb2acee448f835dfac65ed318/config.json",
+              "sha256": "50a67c841676043afdd3af6484ef6a1b47e300e36ee24eb3e07c31da8216f47b",
+              "bytes": 2251
+            },
+            {
+              "name": "small/model.safetensors",
+              "url": "https://huggingface.co/mlx-community/sam-audio-small/resolve/4ca84acc5c47f64bb2acee448f835dfac65ed318/model.safetensors",
+              "sha256": "ae851c17699821e4a7a7c6b0aae44be61c190ceb3c9a603b2a2e5b327d2509f8",
+              "bytes": 2409315890
+            },
+            {
+              "name": "small/model.safetensors.index.json",
+              "url": "https://huggingface.co/mlx-community/sam-audio-small/resolve/4ca84acc5c47f64bb2acee448f835dfac65ed318/model.safetensors.index.json",
+              "sha256": "c3614787f611ace8e3f6b4681d7f67c17080d06b6ae8d28f39e9ef6244c399a8",
+              "bytes": 43404
+            },
+            {
+              "name": "t5-base/config.json",
+              "url": "https://huggingface.co/google-t5/t5-base/resolve/a9723ea7f1b39c1eae772870f3b547bf6ef7e6c1/config.json",
+              "sha256": "46dd7cb62d29c81fb551e0ef1ea274c24a46ba441eeb948897706252933df033",
+              "bytes": 1208
+            },
+            {
+              "name": "t5-base/model.safetensors",
+              "url": "https://huggingface.co/google-t5/t5-base/resolve/a9723ea7f1b39c1eae772870f3b547bf6ef7e6c1/model.safetensors",
+              "sha256": "a90903540cc02cbeb7ff9f823f1a80eb778c7e22426a0e620b01c77a5ec8f5b4",
+              "bytes": 891646390
+            },
+            {
+              "name": "t5-base/spiece.model",
+              "url": "https://huggingface.co/google-t5/t5-base/resolve/a9723ea7f1b39c1eae772870f3b547bf6ef7e6c1/spiece.model",
+              "sha256": "d60acb128cf7b7f2536e8f38a5b18a05535c9e14c7a355904270e15b0945ea86",
+              "bytes": 791656
+            },
+            {
+              "name": "t5-base/tokenizer.json",
+              "url": "https://huggingface.co/google-t5/t5-base/resolve/a9723ea7f1b39c1eae772870f3b547bf6ef7e6c1/tokenizer.json",
+              "sha256": "d2acde0d8d71dd30a711834b07781b9c89feaac33fd332f60507699282740066",
+              "bytes": 1389353
+            }
+          ]
+        },
+        {
+          "id": "base",
+          "name": "Base",
+          "minimumMemoryGB": 24,
+          "steps": 16,
+          "files": [
+            {
+              "name": "base/config.json",
+              "url": "https://huggingface.co/mlx-community/sam-audio-base/resolve/614abc877b48f7918a2db3bbce0cbcc9e798267a/config.json",
+              "sha256": "5282a2932c68a83f75a7a7e1f32d7eac8c24ae36488c87b078780724158c6876",
+              "bytes": 754
+            },
+            {
+              "name": "base/model-00001-of-00001.safetensors",
+              "url": "https://huggingface.co/mlx-community/sam-audio-base/resolve/614abc877b48f7918a2db3bbce0cbcc9e798267a/model-00001-of-00001.safetensors",
+              "sha256": "d7fa64c16b4e72f4486b05fa7993edc2a40fd13891089495b3e5e0be36b3232b",
+              "bytes": 5032052232
+            },
+            {
+              "name": "base/model.safetensors.index.json",
+              "url": "https://huggingface.co/mlx-community/sam-audio-base/resolve/614abc877b48f7918a2db3bbce0cbcc9e798267a/model.safetensors.index.json",
+              "sha256": "57c39da4a94242b1a9de5f9b73183f2ead8b6ddd04044336c006d5fc9cb7ca77",
+              "bytes": 55842
+            },
+            {
+              "name": "t5-base/config.json",
+              "url": "https://huggingface.co/google-t5/t5-base/resolve/a9723ea7f1b39c1eae772870f3b547bf6ef7e6c1/config.json",
+              "sha256": "46dd7cb62d29c81fb551e0ef1ea274c24a46ba441eeb948897706252933df033",
+              "bytes": 1208
+            },
+            {
+              "name": "t5-base/model.safetensors",
+              "url": "https://huggingface.co/google-t5/t5-base/resolve/a9723ea7f1b39c1eae772870f3b547bf6ef7e6c1/model.safetensors",
+              "sha256": "a90903540cc02cbeb7ff9f823f1a80eb778c7e22426a0e620b01c77a5ec8f5b4",
+              "bytes": 891646390
+            },
+            {
+              "name": "t5-base/spiece.model",
+              "url": "https://huggingface.co/google-t5/t5-base/resolve/a9723ea7f1b39c1eae772870f3b547bf6ef7e6c1/spiece.model",
+              "sha256": "d60acb128cf7b7f2536e8f38a5b18a05535c9e14c7a355904270e15b0945ea86",
+              "bytes": 791656
+            },
+            {
+              "name": "t5-base/tokenizer.json",
+              "url": "https://huggingface.co/google-t5/t5-base/resolve/a9723ea7f1b39c1eae772870f3b547bf6ef7e6c1/tokenizer.json",
+              "sha256": "d2acde0d8d71dd30a711834b07781b9c89feaac33fd332f60507699282740066",
+              "bytes": 1389353
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "after",
+      "revision": "60ced7671b229f2164a7a0e6a1d9b5971e9b6ccb",
+      "repository": {
+        "name": "after.tar.gz",
+        "url": "https://codeload.github.com/acids-ircam/AFTER/tar.gz/60ced7671b229f2164a7a0e6a1d9b5971e9b6ccb",
+        "sha256": "150a15f2e86b9d2e16a20f2614a512590cee4e197535771c127f1b0a5bf826b1",
+        "bytes": 14279557
+      },
+      "repositoryDirectory": "AFTER-60ced7671b229f2164a7a0e6a1d9b5971e9b6ccb",
+      "workingSubdirectory": ".",
+      "models": [
+        {
+          "id": "instr",
+          "name": "Instruments",
+          "minimumMemoryGB": 8,
+          "steps": 2,
+          "files": [
+            {
+              "name": "afterv2.audio.instr.ts",
+              "url": "https://nubo.ircam.fr/index.php/s/8NFD5gWwbkT4G5P/download?path=%2FAfter%20models&files=afterv2.audio.instr.ts",
+              "bytes": 220255077,
+              "sha256": "07f62ac54db59cbd19c98455a88af1c0f807d327ac8b67629c6b3cf255d9cee4"
+            }
+          ]
+        },
+        {
+          "id": "drums",
+          "name": "Drums",
+          "minimumMemoryGB": 8,
+          "steps": 2,
+          "files": [
+            {
+              "name": "afterv2.audio.drums.ts",
+              "url": "https://nubo.ircam.fr/index.php/s/8NFD5gWwbkT4G5P/download?path=%2FAfter%20models&files=afterv2.audio.drums.ts",
+              "bytes": 246113333,
+              "sha256": "ea70cf3181bea10c95e51dd88538c2e44def1f63d379335bb1a792defc030027"
+            }
+          ]
+        },
+        {
+          "id": "orchestral",
+          "name": "Orchestral",
+          "minimumMemoryGB": 8,
+          "steps": 2,
+          "files": [
+            {
+              "name": "afterv2.audio.orchestral.ts",
+              "url": "https://nubo.ircam.fr/index.php/s/8NFD5gWwbkT4G5P/download?path=%2FAfter%20models&files=afterv2.audio.orchestral.ts",
+              "bytes": 245188837,
+              "sha256": "cbd9db2bed148d967eeb7d560fd68905ffbdfba3ae4f1243f958560ed7e9db40"
+            }
+          ]
+        },
+        {
+          "id": "speech",
+          "name": "Speech",
+          "minimumMemoryGB": 8,
+          "steps": 2,
+          "files": [
+            {
+              "name": "afterv2.audio.speech.ts",
+              "url": "https://nubo.ircam.fr/index.php/s/8NFD5gWwbkT4G5P/download?path=%2FAfter%20models&files=afterv2.audio.speech.ts",
+              "bytes": 245179261,
+              "sha256": "f22d8ae5ddd20ef1aac05dde5346c26344ee3a2dd5913e1b69bac846f7415dae"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

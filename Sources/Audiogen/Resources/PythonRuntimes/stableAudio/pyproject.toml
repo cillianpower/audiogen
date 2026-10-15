@@ -1,0 +1,12 @@
+[project]
+name = "audiogen-stableaudio-runtime"
+version = "0.1.0"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+  "mlx==0.32.2",
+  "numpy==2.2.6",
+  "sentencepiece>=0.2",
+  "huggingface-hub>=0.20",
+  "soundfile==0.13.1",
+  "scipy>=1.13,<2"
+]

@@ -1,0 +1,26 @@
+name: Build Audiogen
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+jobs:
+  macos:
+    runs-on: xcode-27
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install build tooling
+        run: brew install cmake
+      - name: Build bundled Metal runtime
+        run: ./scripts/build-minimax-runtime.sh
+      - name: Test
+        run: swift test
+      - name: Package app
+        run: ./scripts/build-app.sh
+      - name: Verify signing
+        run: codesign --verify --deep --strict build/Audiogen.app
+      - name: Archive
+        run: ditto -c -k --sequesterRsrc --keepParent build/Audiogen.app build/Audiogen.zip
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Audiogen-arm64
+          path: build/Audiogen.zip
