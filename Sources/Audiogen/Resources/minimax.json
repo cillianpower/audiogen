@@ -1,0 +1,123 @@
+{
+  "engine": "minimax-music-3",
+  "version": "3eef7134",
+  "sourceRevision": "3eef71343e069866278fd9be8217af2cf72c6532",
+  "ggmlRevision": "40e16e4a814f7fe851a0c486fb9e8c722e957830",
+  "modelRevision": "d4f7a6402a4ca10c8b3ca2f648c8a46c103558bc",
+  "presets": [
+    {
+      "id": "efficient",
+      "name": "Efficient",
+      "minimumMemoryGB": 16,
+      "steps": 30,
+      "models": [
+        {
+          "name": "MiniMax-Music3-language_model-Q5_K_M.gguf",
+          "url": "https://huggingface.co/Serveurperso/MiniMax-Music3-GGUF/resolve/d4f7a6402a4ca10c8b3ca2f648c8a46c103558bc/MiniMax-Music3-language_model-Q5_K_M.gguf",
+          "sha256": "6e34cc2be16c7f832198ca07837d026d8adc1f5b7914b76a95b9b4f7e5acd902",
+          "bytes": 6277696800
+        },
+        {
+          "name": "MiniMax-Music3-rvq_depth_decoder-Q8_0.gguf",
+          "url": "https://huggingface.co/Serveurperso/MiniMax-Music3-GGUF/resolve/d4f7a6402a4ca10c8b3ca2f648c8a46c103558bc/MiniMax-Music3-rvq_depth_decoder-Q8_0.gguf",
+          "sha256": "7da73a953747f3f40857ba266a53eeb5487adbe473d4e7a53c99d5eaf9e5c3d5",
+          "bytes": 686513600
+        },
+        {
+          "name": "MiniMax-Music3-condition_encoder-F32.gguf",
+          "url": "https://huggingface.co/Serveurperso/MiniMax-Music3-GGUF/resolve/d4f7a6402a4ca10c8b3ca2f648c8a46c103558bc/MiniMax-Music3-condition_encoder-F32.gguf",
+          "sha256": "ebb69ec6e6d730b4dcc48ba1b51da4f201514cbaaa7cae0c8d6259d3b178efb0",
+          "bytes": 100672192
+        },
+        {
+          "name": "MiniMax-Music3-transformer-Q4_K_M.gguf",
+          "url": "https://huggingface.co/Serveurperso/MiniMax-Music3-GGUF/resolve/d4f7a6402a4ca10c8b3ca2f648c8a46c103558bc/MiniMax-Music3-transformer-Q4_K_M.gguf",
+          "sha256": "4afc48e737c28788b4679f0303ed4d00f13c1f23cf9cc7ff408a2d8266ac6ba8",
+          "bytes": 1389592032
+        },
+        {
+          "name": "MiniMax-Music3-vocoder-F32.gguf",
+          "url": "https://huggingface.co/Serveurperso/MiniMax-Music3-GGUF/resolve/d4f7a6402a4ca10c8b3ca2f648c8a46c103558bc/MiniMax-Music3-vocoder-F32.gguf",
+          "sha256": "4eaa451e54fa755cfe7b0fd15b0bfe64458db35b822e1d250488d0a2a363507d",
+          "bytes": 306102784
+        }
+      ]
+    },
+    {
+      "id": "balanced",
+      "name": "Balanced",
+      "minimumMemoryGB": 24,
+      "steps": 30,
+      "models": [
+        {
+          "name": "MiniMax-Music3-language_model-Q6_K.gguf",
+          "url": "https://huggingface.co/Serveurperso/MiniMax-Music3-GGUF/resolve/d4f7a6402a4ca10c8b3ca2f648c8a46c103558bc/MiniMax-Music3-language_model-Q6_K.gguf",
+          "sha256": "ca605cbae894696f9c111bfef33023b29722e93fe2c287071250b0af1a0e5416",
+          "bytes": 7048279328
+        },
+        {
+          "name": "MiniMax-Music3-rvq_depth_decoder-Q8_0.gguf",
+          "url": "https://huggingface.co/Serveurperso/MiniMax-Music3-GGUF/resolve/d4f7a6402a4ca10c8b3ca2f648c8a46c103558bc/MiniMax-Music3-rvq_depth_decoder-Q8_0.gguf",
+          "sha256": "7da73a953747f3f40857ba266a53eeb5487adbe473d4e7a53c99d5eaf9e5c3d5",
+          "bytes": 686513600
+        },
+        {
+          "name": "MiniMax-Music3-condition_encoder-F32.gguf",
+          "url": "https://huggingface.co/Serveurperso/MiniMax-Music3-GGUF/resolve/d4f7a6402a4ca10c8b3ca2f648c8a46c103558bc/MiniMax-Music3-condition_encoder-F32.gguf",
+          "sha256": "ebb69ec6e6d730b4dcc48ba1b51da4f201514cbaaa7cae0c8d6259d3b178efb0",
+          "bytes": 100672192
+        },
+        {
+          "name": "MiniMax-Music3-transformer-Q6_K.gguf",
+          "url": "https://huggingface.co/Serveurperso/MiniMax-Music3-GGUF/resolve/d4f7a6402a4ca10c8b3ca2f648c8a46c103558bc/MiniMax-Music3-transformer-Q6_K.gguf",
+          "sha256": "9682694cd37d49361315204f69a25b054dbc817e4ed77487fc47d6f8ce7650ac",
+          "bytes": 2014946784
+        },
+        {
+          "name": "MiniMax-Music3-vocoder-F32.gguf",
+          "url": "https://huggingface.co/Serveurperso/MiniMax-Music3-GGUF/resolve/d4f7a6402a4ca10c8b3ca2f648c8a46c103558bc/MiniMax-Music3-vocoder-F32.gguf",
+          "sha256": "4eaa451e54fa755cfe7b0fd15b0bfe64458db35b822e1d250488d0a2a363507d",
+          "bytes": 306102784
+        }
+      ]
+    },
+    {
+      "id": "quality",
+      "name": "Quality",
+      "minimumMemoryGB": 32,
+      "steps": 30,
+      "models": [
+        {
+          "name": "MiniMax-Music3-language_model-Q8_0.gguf",
+          "url": "https://huggingface.co/Serveurperso/MiniMax-Music3-GGUF/resolve/d4f7a6402a4ca10c8b3ca2f648c8a46c103558bc/MiniMax-Music3-language_model-Q8_0.gguf",
+          "sha256": "9ffa190eb5892c5c0829014dc3070b9ce8d2464636bbaae884b08f1bf6de0ad3",
+          "bytes": 9127257376
+        },
+        {
+          "name": "MiniMax-Music3-rvq_depth_decoder-Q8_0.gguf",
+          "url": "https://huggingface.co/Serveurperso/MiniMax-Music3-GGUF/resolve/d4f7a6402a4ca10c8b3ca2f648c8a46c103558bc/MiniMax-Music3-rvq_depth_decoder-Q8_0.gguf",
+          "sha256": "7da73a953747f3f40857ba266a53eeb5487adbe473d4e7a53c99d5eaf9e5c3d5",
+          "bytes": 686513600
+        },
+        {
+          "name": "MiniMax-Music3-condition_encoder-F32.gguf",
+          "url": "https://huggingface.co/Serveurperso/MiniMax-Music3-GGUF/resolve/d4f7a6402a4ca10c8b3ca2f648c8a46c103558bc/MiniMax-Music3-condition_encoder-F32.gguf",
+          "sha256": "ebb69ec6e6d730b4dcc48ba1b51da4f201514cbaaa7cae0c8d6259d3b178efb0",
+          "bytes": 100672192
+        },
+        {
+          "name": "MiniMax-Music3-transformer-Q8_0.gguf",
+          "url": "https://huggingface.co/Serveurperso/MiniMax-Music3-GGUF/resolve/d4f7a6402a4ca10c8b3ca2f648c8a46c103558bc/MiniMax-Music3-transformer-Q8_0.gguf",
+          "sha256": "cbadca0600f325ba9263ea4dcf0d71d0361abf0733303398b9995fbadac6b38e",
+          "bytes": 2602401248
+        },
+        {
+          "name": "MiniMax-Music3-vocoder-F32.gguf",
+          "url": "https://huggingface.co/Serveurperso/MiniMax-Music3-GGUF/resolve/d4f7a6402a4ca10c8b3ca2f648c8a46c103558bc/MiniMax-Music3-vocoder-F32.gguf",
+          "sha256": "4eaa451e54fa755cfe7b0fd15b0bfe64458db35b822e1d250488d0a2a363507d",
+          "bytes": 306102784
+        }
+      ]
+    }
+  ]
+}

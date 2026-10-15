@@ -1,0 +1,946 @@
+{
+  "runtimes": [
+    {
+      "id": "stableAudio",
+      "revision": "3a82c807b69cf4b7c5c05270011a5d5e47abac18",
+      "repository": {
+        "name": "stableAudio.tar.gz",
+        "url": "https://codeload.github.com/Stability-AI/stable-audio-3/tar.gz/3a82c807b69cf4b7c5c05270011a5d5e47abac18",
+        "sha256": "6d5f7911b6117297cc1c719ebd7af9e0b4b7330f287fe9b815592f90ac7c58b2",
+        "bytes": 51760822
+      },
+      "repositoryDirectory": "stable-audio-3-3a82c807b69cf4b7c5c05270011a5d5e47abac18",
+      "models": [
+        {
+          "id": "sm-music",
+          "name": "Small Music",
+          "minimumMemoryGB": 8,
+          "steps": 8,
+          "files": [
+            {
+              "name": "stable/dit_sm-music_f16.npz",
+              "url": "https://huggingface.co/stabilityai/stable-audio-3-optimized/resolve/a0109036e3009e47ba7dcb8a2fec7ee6ac0d1ef8/MLX/dit_sm-music_f16.npz",
+              "sha256": "8ed3f38e2597f361ee675051f1265d9aa2ae2fffce1c61acd2e9fe31e1db1cbc",
+              "bytes": 919193814
+            },
+            {
+              "name": "stable/same_s_decoder_f32.npz",
+              "url": "https://huggingface.co/stabilityai/stable-audio-3-optimized/resolve/a0109036e3009e47ba7dcb8a2fec7ee6ac0d1ef8/MLX/same_s_decoder_f32.npz",
+              "sha256": "909928a8e6937c1ebe6ac4b729f0462bd3773704a11ea18278e42671dc69bfe4",
+              "bytes": 218090820
+            },
+            {
+              "name": "stable/same_s_encoder_f32.npz",
+              "url": "https://huggingface.co/stabilityai/stable-audio-3-optimized/resolve/a0109036e3009e47ba7dcb8a2fec7ee6ac0d1ef8/MLX/same_s_encoder_f32.npz",
+              "sha256": "a48f80d81c30d74c45e2a3047082c4891f715e24c44645adb9c1f4f07afdaf0c",
+              "bytes": 214946620
+            },
+            {
+              "name": "stable/t5gemma_f16.npz",
+              "url": "https://huggingface.co/stabilityai/stable-audio-3-optimized/resolve/a0109036e3009e47ba7dcb8a2fec7ee6ac0d1ef8/MLX/t5gemma_f16.npz",
+              "sha256": "8deb20489f36d9aec539f26c9c67321f99bc5fe300d470435ed6e76be4f16bbd",
+              "bytes": 567443068
+            },
+            {
+              "name": "stable/LICENSE.md",
+              "url": "https://huggingface.co/stabilityai/stable-audio-3-optimized/resolve/a0109036e3009e47ba7dcb8a2fec7ee6ac0d1ef8/LICENSE.md",
+              "sha256": "d6f6b1a4dce5c852bd6d7d9482d002baf0ccdb71e662250b73be9eec8764ee8d",
+              "bytes": 11852
+            },
+            {
+              "name": "stable/LICENSE_GEMMA.md",
+              "url": "https://huggingface.co/stabilityai/stable-audio-3-optimized/resolve/a0109036e3009e47ba7dcb8a2fec7ee6ac0d1ef8/LICENSE_GEMMA.md",
+              "sha256": "e77acc0d3163bb7534675045c584b4d04b387b529239fc4b3647da0a01ba4745",
+              "bytes": 10541
+            },
+            {
+              "name": "stable/NOTICE",
+              "url": "https://huggingface.co/stabilityai/stable-audio-3-optimized/resolve/a0109036e3009e47ba7dcb8a2fec7ee6ac0d1ef8/NOTICE",
+              "sha256": "66f856d7da72797f528fca46b7c80634ab481f917bfe020960e123d84b19f75f",
+              "bytes": 97
+            }
+          ]
+        },
+        {
+          "id": "sm-sfx",
+          "name": "Small Sound Effects",
+          "minimumMemoryGB": 8,
+          "steps": 8,
+          "files": [
+            {
+              "name": "stable/dit_sm-sfx_f16.npz",
+              "url": "https://huggingface.co/stabilityai/stable-audio-3-optimized/resolve/a0109036e3009e47ba7dcb8a2fec7ee6ac0d1ef8/MLX/dit_sm-sfx_f16.npz",
+              "sha256": "7e702d2640699a57fe436ca975fda16832040ba568c1e092c2ae826987558118",
+              "bytes": 919193814
+            },
+            {
+              "name": "stable/same_s_decoder_f32.npz",
+              "url": "https://huggingface.co/stabilityai/stable-audio-3-optimized/resolve/a0109036e3009e47ba7dcb8a2fec7ee6ac0d1ef8/MLX/same_s_decoder_f32.npz",
+              "sha256": "909928a8e6937c1ebe6ac4b729f0462bd3773704a11ea18278e42671dc69bfe4",
+              "bytes": 218090820
+            },
+            {
+              "name": "stable/same_s_encoder_f32.npz",
+              "url": "https://huggingface.co/stabilityai/stable-audio-3-optimized/resolve/a0109036e3009e47ba7dcb8a2fec7ee6ac0d1ef8/MLX/same_s_encoder_f32.npz",
+              "sha256": "a48f80d81c30d74c45e2a3047082c4891f715e24c44645adb9c1f4f07afdaf0c",
+              "bytes": 214946620
+            },
+            {
+              "name": "stable/t5gemma_f16.npz",
+              "url": "https://huggingface.co/stabilityai/stable-audio-3-optimized/resolve/a0109036e3009e47ba7dcb8a2fec7ee6ac0d1ef8/MLX/t5gemma_f16.npz",
+              "sha256": "8deb20489f36d9aec539f26c9c67321f99bc5fe300d470435ed6e76be4f16bbd",
+              "bytes": 567443068
+            },
+            {
+              "name": "stable/LICENSE.md",
+              "url": "https://huggingface.co/stabilityai/stable-audio-3-optimized/resolve/a0109036e3009e47ba7dcb8a2fec7ee6ac0d1ef8/LICENSE.md",
+              "sha256": "d6f6b1a4dce5c852bd6d7d9482d002baf0ccdb71e662250b73be9eec8764ee8d",
+              "bytes": 11852
+            },
+            {
+              "name": "stable/LICENSE_GEMMA.md",
+              "url": "https://huggingface.co/stabilityai/stable-audio-3-optimized/resolve/a0109036e3009e47ba7dcb8a2fec7ee6ac0d1ef8/LICENSE_GEMMA.md",
+              "sha256": "e77acc0d3163bb7534675045c584b4d04b387b529239fc4b3647da0a01ba4745",
+              "bytes": 10541
+            },
+            {
+              "name": "stable/NOTICE",
+              "url": "https://huggingface.co/stabilityai/stable-audio-3-optimized/resolve/a0109036e3009e47ba7dcb8a2fec7ee6ac0d1ef8/NOTICE",
+              "sha256": "66f856d7da72797f528fca46b7c80634ab481f917bfe020960e123d84b19f75f",
+              "bytes": 97
+            }
+          ]
+        },
+        {
+          "id": "medium",
+          "name": "Medium Music",
+          "minimumMemoryGB": 16,
+          "steps": 8,
+          "files": [
+            {
+              "name": "stable/dit_medium_f16.npz",
+              "url": "https://huggingface.co/stabilityai/stable-audio-3-optimized/resolve/a0109036e3009e47ba7dcb8a2fec7ee6ac0d1ef8/MLX/dit_medium_f16.npz",
+              "sha256": "f9e5647ea3225818657d47d47ae4b34afa29c0568206ca89566c1a758944a38e",
+              "bytes": 2907300946
+            },
+            {
+              "name": "stable/same_l_decoder_f32.npz",
+              "url": "https://huggingface.co/stabilityai/stable-audio-3-optimized/resolve/a0109036e3009e47ba7dcb8a2fec7ee6ac0d1ef8/MLX/same_l_decoder_f32.npz",
+              "sha256": "84924be2122d3a20fce443f40b782d9cd88e8e73707476326003ac47659a2287",
+              "bytes": 1704311976
+            },
+            {
+              "name": "stable/same_l_encoder_f32.npz",
+              "url": "https://huggingface.co/stabilityai/stable-audio-3-optimized/resolve/a0109036e3009e47ba7dcb8a2fec7ee6ac0d1ef8/MLX/same_l_encoder_f32.npz",
+              "sha256": "c5caafc6bd29fc3d4cb7a08b0d3725041fa2100711f86a4f05d2638c532871d2",
+              "bytes": 1704313504
+            },
+            {
+              "name": "stable/t5gemma_f16.npz",
+              "url": "https://huggingface.co/stabilityai/stable-audio-3-optimized/resolve/a0109036e3009e47ba7dcb8a2fec7ee6ac0d1ef8/MLX/t5gemma_f16.npz",
+              "sha256": "8deb20489f36d9aec539f26c9c67321f99bc5fe300d470435ed6e76be4f16bbd",
+              "bytes": 567443068
+            },
+            {
+              "name": "stable/LICENSE.md",
+              "url": "https://huggingface.co/stabilityai/stable-audio-3-optimized/resolve/a0109036e3009e47ba7dcb8a2fec7ee6ac0d1ef8/LICENSE.md",
+              "sha256": "d6f6b1a4dce5c852bd6d7d9482d002baf0ccdb71e662250b73be9eec8764ee8d",
+              "bytes": 11852
+            },
+            {
+              "name": "stable/LICENSE_GEMMA.md",
+              "url": "https://huggingface.co/stabilityai/stable-audio-3-optimized/resolve/a0109036e3009e47ba7dcb8a2fec7ee6ac0d1ef8/LICENSE_GEMMA.md",
+              "sha256": "e77acc0d3163bb7534675045c584b4d04b387b529239fc4b3647da0a01ba4745",
+              "bytes": 10541
+            },
+            {
+              "name": "stable/NOTICE",
+              "url": "https://huggingface.co/stabilityai/stable-audio-3-optimized/resolve/a0109036e3009e47ba7dcb8a2fec7ee6ac0d1ef8/NOTICE",
+              "sha256": "66f856d7da72797f528fca46b7c80634ab481f917bfe020960e123d84b19f75f",
+              "bytes": 97
+            }
+          ]
+        }
+      ],
+      "workingSubdirectory": "optimized/mlx"
+    },
+    {
+      "id": "musicGen",
+      "revision": "3c2451568b56297cd8443c4e2a7d09093ee89f96",
+      "repository": {
+        "name": "musicGen.tar.gz",
+        "url": "https://codeload.github.com/andrade0/musicgen-mlx/tar.gz/3c2451568b56297cd8443c4e2a7d09093ee89f96",
+        "sha256": "fcf05970f66cc331d4ff23fcbdd48b7ed394ff30e9c0977e2e742f4a2b3429fa",
+        "bytes": 52509
+      },
+      "repositoryDirectory": "musicgen-mlx-3c2451568b56297cd8443c4e2a7d09093ee89f96",
+      "models": [
+        {
+          "id": "musicgen-small",
+          "name": "Small",
+          "minimumMemoryGB": 8,
+          "steps": 1,
+          "files": [
+            {
+              "name": "musicgen-small/state_dict.bin",
+              "url": "https://huggingface.co/facebook/musicgen-small/resolve/4c8334b02c6ec4e8664a91979669a501ec497792/state_dict.bin",
+              "sha256": "830fe5771e2835cbd305f3ffdda22d3ff38718fbbe8274bd19dc203265de7244",
+              "bytes": 840843863
+            },
+            {
+              "name": "musicgen-small/compression_state_dict.bin",
+              "url": "https://huggingface.co/facebook/musicgen-small/resolve/4c8334b02c6ec4e8664a91979669a501ec497792/compression_state_dict.bin",
+              "sha256": "37d256b525d4117f8bbf790ab448a8e9f4746cd401900fe1ae72e154b1513a30",
+              "bytes": 236001935
+            },
+            {
+              "name": "t5-base/config.json",
+              "url": "https://huggingface.co/t5-base/resolve/a9723ea7f1b39c1eae772870f3b547bf6ef7e6c1/config.json",
+              "sha256": "46dd7cb62d29c81fb551e0ef1ea274c24a46ba441eeb948897706252933df033",
+              "bytes": 1208
+            },
+            {
+              "name": "t5-base/model.safetensors",
+              "url": "https://huggingface.co/t5-base/resolve/a9723ea7f1b39c1eae772870f3b547bf6ef7e6c1/model.safetensors",
+              "sha256": "a90903540cc02cbeb7ff9f823f1a80eb778c7e22426a0e620b01c77a5ec8f5b4",
+              "bytes": 891646390
+            },
+            {
+              "name": "t5-base/spiece.model",
+              "url": "https://huggingface.co/t5-base/resolve/a9723ea7f1b39c1eae772870f3b547bf6ef7e6c1/spiece.model",
+              "sha256": "d60acb128cf7b7f2536e8f38a5b18a05535c9e14c7a355904270e15b0945ea86",
+              "bytes": 791656
+            },
+            {
+              "name": "t5-base/tokenizer.json",
+              "url": "https://huggingface.co/t5-base/resolve/a9723ea7f1b39c1eae772870f3b547bf6ef7e6c1/tokenizer.json",
+              "sha256": "d2acde0d8d71dd30a711834b07781b9c89feaac33fd332f60507699282740066",
+              "bytes": 1389353
+            }
+          ]
+        },
+        {
+          "id": "musicgen-medium",
+          "name": "Medium",
+          "minimumMemoryGB": 16,
+          "steps": 1,
+          "files": [
+            {
+              "name": "musicgen-medium/state_dict.bin",
+              "url": "https://huggingface.co/facebook/musicgen-medium/resolve/d3bd7b00761b78ad7a8a05145ee31e7832e9916c/state_dict.bin",
+              "sha256": "fbc9f401db2aba7518adf208ce5a56aca4ece335242e8274ce1ebd3dfbc86cf5",
+              "bytes": 3677668599
+            },
+            {
+              "name": "musicgen-medium/compression_state_dict.bin",
+              "url": "https://huggingface.co/facebook/musicgen-medium/resolve/d3bd7b00761b78ad7a8a05145ee31e7832e9916c/compression_state_dict.bin",
+              "sha256": "37d256b525d4117f8bbf790ab448a8e9f4746cd401900fe1ae72e154b1513a30",
+              "bytes": 236001935
+            },
+            {
+              "name": "t5-base/config.json",
+              "url": "https://huggingface.co/t5-base/resolve/a9723ea7f1b39c1eae772870f3b547bf6ef7e6c1/config.json",
+              "sha256": "46dd7cb62d29c81fb551e0ef1ea274c24a46ba441eeb948897706252933df033",
+              "bytes": 1208
+            },
+            {
+              "name": "t5-base/model.safetensors",
+              "url": "https://huggingface.co/t5-base/resolve/a9723ea7f1b39c1eae772870f3b547bf6ef7e6c1/model.safetensors",
+              "sha256": "a90903540cc02cbeb7ff9f823f1a80eb778c7e22426a0e620b01c77a5ec8f5b4",
+              "bytes": 891646390
+            },
+            {
+              "name": "t5-base/spiece.model",
+              "url": "https://huggingface.co/t5-base/resolve/a9723ea7f1b39c1eae772870f3b547bf6ef7e6c1/spiece.model",
+              "sha256": "d60acb128cf7b7f2536e8f38a5b18a05535c9e14c7a355904270e15b0945ea86",
+              "bytes": 791656
+            },
+            {
+              "name": "t5-base/tokenizer.json",
+              "url": "https://huggingface.co/t5-base/resolve/a9723ea7f1b39c1eae772870f3b547bf6ef7e6c1/tokenizer.json",
+              "sha256": "d2acde0d8d71dd30a711834b07781b9c89feaac33fd332f60507699282740066",
+              "bytes": 1389353
+            }
+          ]
+        },
+        {
+          "id": "musicgen-large",
+          "name": "Large",
+          "minimumMemoryGB": 24,
+          "steps": 1,
+          "files": [
+            {
+              "name": "musicgen-large/state_dict.bin",
+              "url": "https://huggingface.co/facebook/musicgen-large/resolve/15ccdc92099879e47b6da12c350cdb71d4eab3ca/state_dict.bin",
+              "sha256": "1f0cf17b5e65c5dd8ba71767371c377f174e4ce1db44bc4d6657825769f26ffd",
+              "bytes": 6514108999
+            },
+            {
+              "name": "musicgen-large/compression_state_dict.bin",
+              "url": "https://huggingface.co/facebook/musicgen-large/resolve/15ccdc92099879e47b6da12c350cdb71d4eab3ca/compression_state_dict.bin",
+              "sha256": "37d256b525d4117f8bbf790ab448a8e9f4746cd401900fe1ae72e154b1513a30",
+              "bytes": 236001935
+            },
+            {
+              "name": "t5-base/config.json",
+              "url": "https://huggingface.co/t5-base/resolve/a9723ea7f1b39c1eae772870f3b547bf6ef7e6c1/config.json",
+              "sha256": "46dd7cb62d29c81fb551e0ef1ea274c24a46ba441eeb948897706252933df033",
+              "bytes": 1208
+            },
+            {
+              "name": "t5-base/model.safetensors",
+              "url": "https://huggingface.co/t5-base/resolve/a9723ea7f1b39c1eae772870f3b547bf6ef7e6c1/model.safetensors",
+              "sha256": "a90903540cc02cbeb7ff9f823f1a80eb778c7e22426a0e620b01c77a5ec8f5b4",
+              "bytes": 891646390
+            },
+            {
+              "name": "t5-base/spiece.model",
+              "url": "https://huggingface.co/t5-base/resolve/a9723ea7f1b39c1eae772870f3b547bf6ef7e6c1/spiece.model",
+              "sha256": "d60acb128cf7b7f2536e8f38a5b18a05535c9e14c7a355904270e15b0945ea86",
+              "bytes": 791656
+            },
+            {
+              "name": "t5-base/tokenizer.json",
+              "url": "https://huggingface.co/t5-base/resolve/a9723ea7f1b39c1eae772870f3b547bf6ef7e6c1/tokenizer.json",
+              "sha256": "d2acde0d8d71dd30a711834b07781b9c89feaac33fd332f60507699282740066",
+              "bytes": 1389353
+            }
+          ]
+        },
+        {
+          "id": "musicgen-stereo-small",
+          "name": "Stereo Small",
+          "minimumMemoryGB": 8,
+          "steps": 1,
+          "files": [
+            {
+              "name": "musicgen-stereo-small/state_dict.bin",
+              "url": "https://huggingface.co/facebook/musicgen-stereo-small/resolve/3a110c0092820d470372c880c5ea06ce21a78ddd/state_dict.bin",
+              "sha256": "4b2a5fd7544ce68f1f3576871697ee459b7a237488e352da2db073c84bd3be65",
+              "bytes": 874410235
+            },
+            {
+              "name": "musicgen-stereo-small/compression_state_dict.bin",
+              "url": "https://huggingface.co/facebook/musicgen-stereo-small/resolve/3a110c0092820d470372c880c5ea06ce21a78ddd/compression_state_dict.bin",
+              "sha256": "43c990a49a2c179f5d1a084db79f62a06384c186b4afc134c4eb49a8297a06a7",
+              "bytes": 589
+            },
+            {
+              "name": "t5-base/config.json",
+              "url": "https://huggingface.co/t5-base/resolve/a9723ea7f1b39c1eae772870f3b547bf6ef7e6c1/config.json",
+              "sha256": "46dd7cb62d29c81fb551e0ef1ea274c24a46ba441eeb948897706252933df033",
+              "bytes": 1208
+            },
+            {
+              "name": "t5-base/model.safetensors",
+              "url": "https://huggingface.co/t5-base/resolve/a9723ea7f1b39c1eae772870f3b547bf6ef7e6c1/model.safetensors",
+              "sha256": "a90903540cc02cbeb7ff9f823f1a80eb778c7e22426a0e620b01c77a5ec8f5b4",
+              "bytes": 891646390
+            },
+            {
+              "name": "t5-base/spiece.model",
+              "url": "https://huggingface.co/t5-base/resolve/a9723ea7f1b39c1eae772870f3b547bf6ef7e6c1/spiece.model",
+              "sha256": "d60acb128cf7b7f2536e8f38a5b18a05535c9e14c7a355904270e15b0945ea86",
+              "bytes": 791656
+            },
+            {
+              "name": "t5-base/tokenizer.json",
+              "url": "https://huggingface.co/t5-base/resolve/a9723ea7f1b39c1eae772870f3b547bf6ef7e6c1/tokenizer.json",
+              "sha256": "d2acde0d8d71dd30a711834b07781b9c89feaac33fd332f60507699282740066",
+              "bytes": 1389353
+            },
+            {
+              "name": "encodec_32khz/config.json",
+              "url": "https://huggingface.co/facebook/encodec_32khz/resolve/d0c45384f6c44db055f78200cfdcb9c1c8706727/config.json",
+              "sha256": "7def02be473b8dd396cbfc2528c18a29107bb9964537e0a3c56caa41c8fff784",
+              "bytes": 758
+            },
+            {
+              "name": "encodec_32khz/model.safetensors",
+              "url": "https://huggingface.co/facebook/encodec_32khz/resolve/d0c45384f6c44db055f78200cfdcb9c1c8706727/model.safetensors",
+              "sha256": "0e78f34d2ff3259f29bd51f7a99060151fe4ba5776fee216f58847f06082f1ca",
+              "bytes": 235972432
+            },
+            {
+              "name": "encodec_32khz/preprocessor_config.json",
+              "url": "https://huggingface.co/facebook/encodec_32khz/resolve/d0c45384f6c44db055f78200cfdcb9c1c8706727/preprocessor_config.json",
+              "sha256": "8a27f6994d117629380e03fa70981bbf6ce967a4242858b539f0b2e98799306c",
+              "bytes": 234
+            }
+          ]
+        },
+        {
+          "id": "musicgen-stereo-medium",
+          "name": "Stereo Medium",
+          "minimumMemoryGB": 16,
+          "steps": 1,
+          "files": [
+            {
+              "name": "musicgen-stereo-medium/state_dict.bin",
+              "url": "https://huggingface.co/facebook/musicgen-stereo-medium/resolve/2747e613fbaadc43b14257224326ef58c5c11b81/state_dict.bin",
+              "sha256": "8ff5720393cd2b5cd1e9f2acb6050fb5211ed308544e36f8dbdd7d61a10c86e9",
+              "bytes": 3728016987
+            },
+            {
+              "name": "musicgen-stereo-medium/compression_state_dict.bin",
+              "url": "https://huggingface.co/facebook/musicgen-stereo-medium/resolve/2747e613fbaadc43b14257224326ef58c5c11b81/compression_state_dict.bin",
+              "sha256": "43c990a49a2c179f5d1a084db79f62a06384c186b4afc134c4eb49a8297a06a7",
+              "bytes": 589
+            },
+            {
+              "name": "t5-base/config.json",
+              "url": "https://huggingface.co/t5-base/resolve/a9723ea7f1b39c1eae772870f3b547bf6ef7e6c1/config.json",
+              "sha256": "46dd7cb62d29c81fb551e0ef1ea274c24a46ba441eeb948897706252933df033",
+              "bytes": 1208
+            },
+            {
+              "name": "t5-base/model.safetensors",
+              "url": "https://huggingface.co/t5-base/resolve/a9723ea7f1b39c1eae772870f3b547bf6ef7e6c1/model.safetensors",
+              "sha256": "a90903540cc02cbeb7ff9f823f1a80eb778c7e22426a0e620b01c77a5ec8f5b4",
+              "bytes": 891646390
+            },
+            {
+              "name": "t5-base/spiece.model",
+              "url": "https://huggingface.co/t5-base/resolve/a9723ea7f1b39c1eae772870f3b547bf6ef7e6c1/spiece.model",
+              "sha256": "d60acb128cf7b7f2536e8f38a5b18a05535c9e14c7a355904270e15b0945ea86",
+              "bytes": 791656
+            },
+            {
+              "name": "t5-base/tokenizer.json",
+              "url": "https://huggingface.co/t5-base/resolve/a9723ea7f1b39c1eae772870f3b547bf6ef7e6c1/tokenizer.json",
+              "sha256": "d2acde0d8d71dd30a711834b07781b9c89feaac33fd332f60507699282740066",
+              "bytes": 1389353
+            },
+            {
+              "name": "encodec_32khz/config.json",
+              "url": "https://huggingface.co/facebook/encodec_32khz/resolve/d0c45384f6c44db055f78200cfdcb9c1c8706727/config.json",
+              "sha256": "7def02be473b8dd396cbfc2528c18a29107bb9964537e0a3c56caa41c8fff784",
+              "bytes": 758
+            },
+            {
+              "name": "encodec_32khz/model.safetensors",
+              "url": "https://huggingface.co/facebook/encodec_32khz/resolve/d0c45384f6c44db055f78200cfdcb9c1c8706727/model.safetensors",
+              "sha256": "0e78f34d2ff3259f29bd51f7a99060151fe4ba5776fee216f58847f06082f1ca",
+              "bytes": 235972432
+            },
+            {
+              "name": "encodec_32khz/preprocessor_config.json",
+              "url": "https://huggingface.co/facebook/encodec_32khz/resolve/d0c45384f6c44db055f78200cfdcb9c1c8706727/preprocessor_config.json",
+              "sha256": "8a27f6994d117629380e03fa70981bbf6ce967a4242858b539f0b2e98799306c",
+              "bytes": 234
+            }
+          ]
+        },
+        {
+          "id": "musicgen-stereo-large",
+          "name": "Stereo Large",
+          "minimumMemoryGB": 24,
+          "steps": 1,
+          "files": [
+            {
+              "name": "musicgen-stereo-large/state_dict.bin",
+              "url": "https://huggingface.co/facebook/musicgen-stereo-large/resolve/bda8ec330c9c17e09728589eaf678f58f7d2d932/state_dict.bin",
+              "sha256": "8c48998345be88a26fd5aab474033492a63a9511d0a5c256924d3b173cc303f4",
+              "bytes": 6581238791
+            },
+            {
+              "name": "musicgen-stereo-large/compression_state_dict.bin",
+              "url": "https://huggingface.co/facebook/musicgen-stereo-large/resolve/bda8ec330c9c17e09728589eaf678f58f7d2d932/compression_state_dict.bin",
+              "sha256": "43c990a49a2c179f5d1a084db79f62a06384c186b4afc134c4eb49a8297a06a7",
+              "bytes": 589
+            },
+            {
+              "name": "t5-base/config.json",
+              "url": "https://huggingface.co/t5-base/resolve/a9723ea7f1b39c1eae772870f3b547bf6ef7e6c1/config.json",
+              "sha256": "46dd7cb62d29c81fb551e0ef1ea274c24a46ba441eeb948897706252933df033",
+              "bytes": 1208
+            },
+            {
+              "name": "t5-base/model.safetensors",
+              "url": "https://huggingface.co/t5-base/resolve/a9723ea7f1b39c1eae772870f3b547bf6ef7e6c1/model.safetensors",
+              "sha256": "a90903540cc02cbeb7ff9f823f1a80eb778c7e22426a0e620b01c77a5ec8f5b4",
+              "bytes": 891646390
+            },
+            {
+              "name": "t5-base/spiece.model",
+              "url": "https://huggingface.co/t5-base/resolve/a9723ea7f1b39c1eae772870f3b547bf6ef7e6c1/spiece.model",
+              "sha256": "d60acb128cf7b7f2536e8f38a5b18a05535c9e14c7a355904270e15b0945ea86",
+              "bytes": 791656
+            },
+            {
+              "name": "t5-base/tokenizer.json",
+              "url": "https://huggingface.co/t5-base/resolve/a9723ea7f1b39c1eae772870f3b547bf6ef7e6c1/tokenizer.json",
+              "sha256": "d2acde0d8d71dd30a711834b07781b9c89feaac33fd332f60507699282740066",
+              "bytes": 1389353
+            },
+            {
+              "name": "encodec_32khz/config.json",
+              "url": "https://huggingface.co/facebook/encodec_32khz/resolve/d0c45384f6c44db055f78200cfdcb9c1c8706727/config.json",
+              "sha256": "7def02be473b8dd396cbfc2528c18a29107bb9964537e0a3c56caa41c8fff784",
+              "bytes": 758
+            },
+            {
+              "name": "encodec_32khz/model.safetensors",
+              "url": "https://huggingface.co/facebook/encodec_32khz/resolve/d0c45384f6c44db055f78200cfdcb9c1c8706727/model.safetensors",
+              "sha256": "0e78f34d2ff3259f29bd51f7a99060151fe4ba5776fee216f58847f06082f1ca",
+              "bytes": 235972432
+            },
+            {
+              "name": "encodec_32khz/preprocessor_config.json",
+              "url": "https://huggingface.co/facebook/encodec_32khz/resolve/d0c45384f6c44db055f78200cfdcb9c1c8706727/preprocessor_config.json",
+              "sha256": "8a27f6994d117629380e03fa70981bbf6ce967a4242858b539f0b2e98799306c",
+              "bytes": 234
+            }
+          ]
+        }
+      ],
+      "workingSubdirectory": "."
+    },
+    {
+      "id": "yue",
+      "revision": "9253ed133343406947bde7b67d43c7a63fb39d99",
+      "repository": {
+        "name": "yue.tar.gz",
+        "url": "https://codeload.github.com/vanch007/mlx-Yue/tar.gz/9253ed133343406947bde7b67d43c7a63fb39d99",
+        "sha256": "df20cc4e2d57b29769e9c5130321f62c3b1ab2ac7805aaa520a2b926938b3056",
+        "bytes": 318471742
+      },
+      "repositoryDirectory": "mlx-Yue-9253ed133343406947bde7b67d43c7a63fb39d99",
+      "models": [
+        {
+          "id": "8bit",
+          "name": "8-bit",
+          "minimumMemoryGB": 24,
+          "steps": 8,
+          "files": [
+            {
+              "name": "yue/LICENSE",
+              "url": "https://huggingface.co/vanch007/mlx-Yue2-3B/resolve/fa66d203dd56d7e033e05ee8b32269768984c4cc/LICENSE",
+              "sha256": "060985741d20e70613b4c189c7de106cabd3fb2109fbbfb6d705c9d619417dd0",
+              "bytes": 20309
+            },
+            {
+              "name": "yue/THIRD_PARTY_NOTICES.md",
+              "url": "https://huggingface.co/vanch007/mlx-Yue2-3B/resolve/fa66d203dd56d7e033e05ee8b32269768984c4cc/THIRD_PARTY_NOTICES.md",
+              "sha256": "14d3fd9f6fee86b4260b69b0979735b99ffec8c6b4db254567047a4215cd9af3",
+              "bytes": 793
+            },
+            {
+              "name": "yue/ar-8bit.safetensors",
+              "url": "https://huggingface.co/vanch007/mlx-Yue2-3B/resolve/fa66d203dd56d7e033e05ee8b32269768984c4cc/ar-8bit.safetensors",
+              "sha256": "7b7d7796d348e6f2abce0a28e116557f41e16c00c0e03ee47f540e3f3c3e1e45",
+              "bytes": 2656158264
+            },
+            {
+              "name": "yue/ar-bf16.safetensors",
+              "url": "https://huggingface.co/vanch007/mlx-Yue2-3B/resolve/fa66d203dd56d7e033e05ee8b32269768984c4cc/ar-bf16.safetensors",
+              "sha256": "67275a875e7c717a4ea63c4e7f6a8b5ea2704d04768049f87a6b9e5ecfe16dca",
+              "bytes": 4331951136
+            },
+            {
+              "name": "yue/config.json",
+              "url": "https://huggingface.co/vanch007/mlx-Yue2-3B/resolve/fa66d203dd56d7e033e05ee8b32269768984c4cc/config.json",
+              "sha256": "ad3477bbef890bf98ae196c1e4b44779494a6231c4ab66f32708eabadf265329",
+              "bytes": 959
+            },
+            {
+              "name": "yue/conversion.json",
+              "url": "https://huggingface.co/vanch007/mlx-Yue2-3B/resolve/fa66d203dd56d7e033e05ee8b32269768984c4cc/conversion.json",
+              "sha256": "48fa8aa551c1a33eb57e52c1a91453b2e8f4d39cd2f28d41ab8030b320f47012",
+              "bytes": 3784
+            },
+            {
+              "name": "yue/licenses/SnakeBeta-NVIDIA-MIT.txt",
+              "url": "https://huggingface.co/vanch007/mlx-Yue2-3B/resolve/fa66d203dd56d7e033e05ee8b32269768984c4cc/licenses/SnakeBeta-NVIDIA-MIT.txt",
+              "sha256": "da9858d516047d82096d01c112a61bd67f26d289039464d668a1d45f91738ecc",
+              "bytes": 1076
+            },
+            {
+              "name": "yue/licenses/stable-audio-tools-MIT.txt",
+              "url": "https://huggingface.co/vanch007/mlx-Yue2-3B/resolve/fa66d203dd56d7e033e05ee8b32269768984c4cc/licenses/stable-audio-tools-MIT.txt",
+              "sha256": "a1fac33b7bcd791b74fb33aeb439f825e7277e239fc119fb7d2ab6f084a0c101",
+              "bytes": 1069
+            },
+            {
+              "name": "yue/nar-bf16.safetensors",
+              "url": "https://huggingface.co/vanch007/mlx-Yue2-3B/resolve/fa66d203dd56d7e033e05ee8b32269768984c4cc/nar-bf16.safetensors",
+              "sha256": "e6dbc167e15241447708068ed5efc612aba1934878d04278583ec54d5dc10869",
+              "bytes": 2929490456
+            },
+            {
+              "name": "yue/qwen.tiktoken",
+              "url": "https://huggingface.co/vanch007/mlx-Yue2-3B/resolve/fa66d203dd56d7e033e05ee8b32269768984c4cc/qwen.tiktoken",
+              "sha256": "b2b1b8dfb5cc5f024bafc373121c6aba3f66f9a5a0269e243470a1de16a33186",
+              "bytes": 2561218
+            },
+            {
+              "name": "yue-vae/LICENSE",
+              "url": "https://huggingface.co/m-a-p/YuE2-Vae/resolve/95535e72a97bc0f09b8ada125d26b4009428c0e8/LICENSE",
+              "sha256": "060985741d20e70613b4c189c7de106cabd3fb2109fbbfb6d705c9d619417dd0",
+              "bytes": 20309
+            },
+            {
+              "name": "yue-vae/THIRD_PARTY_NOTICES.md",
+              "url": "https://huggingface.co/m-a-p/YuE2-Vae/resolve/95535e72a97bc0f09b8ada125d26b4009428c0e8/THIRD_PARTY_NOTICES.md",
+              "sha256": "14d3fd9f6fee86b4260b69b0979735b99ffec8c6b4db254567047a4215cd9af3",
+              "bytes": 793
+            },
+            {
+              "name": "yue-vae/assets/architecture.png",
+              "url": "https://huggingface.co/m-a-p/YuE2-Vae/resolve/95535e72a97bc0f09b8ada125d26b4009428c0e8/assets/architecture.png",
+              "sha256": "53345d556ec1762dc7071b76ab0d79518c8cdf52bbf48ad434c3c34926ff74a3",
+              "bytes": 407643
+            },
+            {
+              "name": "yue-vae/assets/figure1.png",
+              "url": "https://huggingface.co/m-a-p/YuE2-Vae/resolve/95535e72a97bc0f09b8ada125d26b4009428c0e8/assets/figure1.png",
+              "sha256": "c52f18c1aaad89b6411db96ad2625f9fd3547d08577fe071940f4ca5aac798e5",
+              "bytes": 147143
+            },
+            {
+              "name": "yue-vae/assets/logo.png",
+              "url": "https://huggingface.co/m-a-p/YuE2-Vae/resolve/95535e72a97bc0f09b8ada125d26b4009428c0e8/assets/logo.png",
+              "sha256": "d57837783827061e6e4c6c817468c3e904cce06015a51a95fbd46add27f7af48",
+              "bytes": 14085
+            },
+            {
+              "name": "yue-vae/config.json",
+              "url": "https://huggingface.co/m-a-p/YuE2-Vae/resolve/95535e72a97bc0f09b8ada125d26b4009428c0e8/config.json",
+              "sha256": "f0191bb9694009956de44e0c361a6f1334760be4c8f848e599bde242a54a0970",
+              "bytes": 1378
+            },
+            {
+              "name": "yue-vae/licenses/SnakeBeta-NVIDIA-MIT.txt",
+              "url": "https://huggingface.co/m-a-p/YuE2-Vae/resolve/95535e72a97bc0f09b8ada125d26b4009428c0e8/licenses/SnakeBeta-NVIDIA-MIT.txt",
+              "sha256": "da9858d516047d82096d01c112a61bd67f26d289039464d668a1d45f91738ecc",
+              "bytes": 1076
+            },
+            {
+              "name": "yue-vae/licenses/stable-audio-tools-MIT.txt",
+              "url": "https://huggingface.co/m-a-p/YuE2-Vae/resolve/95535e72a97bc0f09b8ada125d26b4009428c0e8/licenses/stable-audio-tools-MIT.txt",
+              "sha256": "a1fac33b7bcd791b74fb33aeb439f825e7277e239fc119fb7d2ab6f084a0c101",
+              "bytes": 1069
+            },
+            {
+              "name": "yue-vae/model.safetensors",
+              "url": "https://huggingface.co/m-a-p/YuE2-Vae/resolve/95535e72a97bc0f09b8ada125d26b4009428c0e8/model.safetensors",
+              "sha256": "807ce9d5149fa27c5ad3e6582058469852e908f6c5acc8c8aa338e7ab7751346",
+              "bytes": 530512720
+            },
+            {
+              "name": "yue-vae/weights_manifest.json",
+              "url": "https://huggingface.co/m-a-p/YuE2-Vae/resolve/95535e72a97bc0f09b8ada125d26b4009428c0e8/weights_manifest.json",
+              "sha256": "017d64a4d288217a43fcac3866a0e1d55f796fa891d4dfb6de0bd170ab750026",
+              "bytes": 178
+            }
+          ]
+        },
+        {
+          "id": "bf16",
+          "name": "BF16",
+          "minimumMemoryGB": 24,
+          "steps": 32,
+          "files": [
+            {
+              "name": "yue/LICENSE",
+              "url": "https://huggingface.co/vanch007/mlx-Yue2-3B/resolve/fa66d203dd56d7e033e05ee8b32269768984c4cc/LICENSE",
+              "sha256": "060985741d20e70613b4c189c7de106cabd3fb2109fbbfb6d705c9d619417dd0",
+              "bytes": 20309
+            },
+            {
+              "name": "yue/THIRD_PARTY_NOTICES.md",
+              "url": "https://huggingface.co/vanch007/mlx-Yue2-3B/resolve/fa66d203dd56d7e033e05ee8b32269768984c4cc/THIRD_PARTY_NOTICES.md",
+              "sha256": "14d3fd9f6fee86b4260b69b0979735b99ffec8c6b4db254567047a4215cd9af3",
+              "bytes": 793
+            },
+            {
+              "name": "yue/ar-8bit.safetensors",
+              "url": "https://huggingface.co/vanch007/mlx-Yue2-3B/resolve/fa66d203dd56d7e033e05ee8b32269768984c4cc/ar-8bit.safetensors",
+              "sha256": "7b7d7796d348e6f2abce0a28e116557f41e16c00c0e03ee47f540e3f3c3e1e45",
+              "bytes": 2656158264
+            },
+            {
+              "name": "yue/ar-bf16.safetensors",
+              "url": "https://huggingface.co/vanch007/mlx-Yue2-3B/resolve/fa66d203dd56d7e033e05ee8b32269768984c4cc/ar-bf16.safetensors",
+              "sha256": "67275a875e7c717a4ea63c4e7f6a8b5ea2704d04768049f87a6b9e5ecfe16dca",
+              "bytes": 4331951136
+            },
+            {
+              "name": "yue/config.json",
+              "url": "https://huggingface.co/vanch007/mlx-Yue2-3B/resolve/fa66d203dd56d7e033e05ee8b32269768984c4cc/config.json",
+              "sha256": "ad3477bbef890bf98ae196c1e4b44779494a6231c4ab66f32708eabadf265329",
+              "bytes": 959
+            },
+            {
+              "name": "yue/conversion.json",
+              "url": "https://huggingface.co/vanch007/mlx-Yue2-3B/resolve/fa66d203dd56d7e033e05ee8b32269768984c4cc/conversion.json",
+              "sha256": "48fa8aa551c1a33eb57e52c1a91453b2e8f4d39cd2f28d41ab8030b320f47012",
+              "bytes": 3784
+            },
+            {
+              "name": "yue/licenses/SnakeBeta-NVIDIA-MIT.txt",
+              "url": "https://huggingface.co/vanch007/mlx-Yue2-3B/resolve/fa66d203dd56d7e033e05ee8b32269768984c4cc/licenses/SnakeBeta-NVIDIA-MIT.txt",
+              "sha256": "da9858d516047d82096d01c112a61bd67f26d289039464d668a1d45f91738ecc",
+              "bytes": 1076
+            },
+            {
+              "name": "yue/licenses/stable-audio-tools-MIT.txt",
+              "url": "https://huggingface.co/vanch007/mlx-Yue2-3B/resolve/fa66d203dd56d7e033e05ee8b32269768984c4cc/licenses/stable-audio-tools-MIT.txt",
+              "sha256": "a1fac33b7bcd791b74fb33aeb439f825e7277e239fc119fb7d2ab6f084a0c101",
+              "bytes": 1069
+            },
+            {
+              "name": "yue/nar-bf16.safetensors",
+              "url": "https://huggingface.co/vanch007/mlx-Yue2-3B/resolve/fa66d203dd56d7e033e05ee8b32269768984c4cc/nar-bf16.safetensors",
+              "sha256": "e6dbc167e15241447708068ed5efc612aba1934878d04278583ec54d5dc10869",
+              "bytes": 2929490456
+            },
+            {
+              "name": "yue/qwen.tiktoken",
+              "url": "https://huggingface.co/vanch007/mlx-Yue2-3B/resolve/fa66d203dd56d7e033e05ee8b32269768984c4cc/qwen.tiktoken",
+              "sha256": "b2b1b8dfb5cc5f024bafc373121c6aba3f66f9a5a0269e243470a1de16a33186",
+              "bytes": 2561218
+            },
+            {
+              "name": "yue-vae/LICENSE",
+              "url": "https://huggingface.co/m-a-p/YuE2-Vae/resolve/95535e72a97bc0f09b8ada125d26b4009428c0e8/LICENSE",
+              "sha256": "060985741d20e70613b4c189c7de106cabd3fb2109fbbfb6d705c9d619417dd0",
+              "bytes": 20309
+            },
+            {
+              "name": "yue-vae/THIRD_PARTY_NOTICES.md",
+              "url": "https://huggingface.co/m-a-p/YuE2-Vae/resolve/95535e72a97bc0f09b8ada125d26b4009428c0e8/THIRD_PARTY_NOTICES.md",
+              "sha256": "14d3fd9f6fee86b4260b69b0979735b99ffec8c6b4db254567047a4215cd9af3",
+              "bytes": 793
+            },
+            {
+              "name": "yue-vae/assets/architecture.png",
+              "url": "https://huggingface.co/m-a-p/YuE2-Vae/resolve/95535e72a97bc0f09b8ada125d26b4009428c0e8/assets/architecture.png",
+              "sha256": "53345d556ec1762dc7071b76ab0d79518c8cdf52bbf48ad434c3c34926ff74a3",
+              "bytes": 407643
+            },
+            {
+              "name": "yue-vae/assets/figure1.png",
+              "url": "https://huggingface.co/m-a-p/YuE2-Vae/resolve/95535e72a97bc0f09b8ada125d26b4009428c0e8/assets/figure1.png",
+              "sha256": "c52f18c1aaad89b6411db96ad2625f9fd3547d08577fe071940f4ca5aac798e5",
+              "bytes": 147143
+            },
+            {
+              "name": "yue-vae/assets/logo.png",
+              "url": "https://huggingface.co/m-a-p/YuE2-Vae/resolve/95535e72a97bc0f09b8ada125d26b4009428c0e8/assets/logo.png",
+              "sha256": "d57837783827061e6e4c6c817468c3e904cce06015a51a95fbd46add27f7af48",
+              "bytes": 14085
+            },
+            {
+              "name": "yue-vae/config.json",
+              "url": "https://huggingface.co/m-a-p/YuE2-Vae/resolve/95535e72a97bc0f09b8ada125d26b4009428c0e8/config.json",
+              "sha256": "f0191bb9694009956de44e0c361a6f1334760be4c8f848e599bde242a54a0970",
+              "bytes": 1378
+            },
+            {
+              "name": "yue-vae/licenses/SnakeBeta-NVIDIA-MIT.txt",
+              "url": "https://huggingface.co/m-a-p/YuE2-Vae/resolve/95535e72a97bc0f09b8ada125d26b4009428c0e8/licenses/SnakeBeta-NVIDIA-MIT.txt",
+              "sha256": "da9858d516047d82096d01c112a61bd67f26d289039464d668a1d45f91738ecc",
+              "bytes": 1076
+            },
+            {
+              "name": "yue-vae/licenses/stable-audio-tools-MIT.txt",
+              "url": "https://huggingface.co/m-a-p/YuE2-Vae/resolve/95535e72a97bc0f09b8ada125d26b4009428c0e8/licenses/stable-audio-tools-MIT.txt",
+              "sha256": "a1fac33b7bcd791b74fb33aeb439f825e7277e239fc119fb7d2ab6f084a0c101",
+              "bytes": 1069
+            },
+            {
+              "name": "yue-vae/model.safetensors",
+              "url": "https://huggingface.co/m-a-p/YuE2-Vae/resolve/95535e72a97bc0f09b8ada125d26b4009428c0e8/model.safetensors",
+              "sha256": "807ce9d5149fa27c5ad3e6582058469852e908f6c5acc8c8aa338e7ab7751346",
+              "bytes": 530512720
+            },
+            {
+              "name": "yue-vae/weights_manifest.json",
+              "url": "https://huggingface.co/m-a-p/YuE2-Vae/resolve/95535e72a97bc0f09b8ada125d26b4009428c0e8/weights_manifest.json",
+              "sha256": "017d64a4d288217a43fcac3866a0e1d55f796fa891d4dfb6de0bd170ab750026",
+              "bytes": 178
+            }
+          ]
+        }
+      ],
+      "workingSubdirectory": "."
+    }
+  ],
+  "aceModels": [
+    {
+      "id": "acestep-v15-sft",
+      "name": "SFT",
+      "minimumMemoryGB": 16,
+      "steps": 50,
+      "files": [
+        {
+          "name": "acestep-v15-sft/apg_guidance.py",
+          "url": "https://huggingface.co/ACE-Step/acestep-v15-sft/resolve/c410d249e71ea9385a7b586865e65b1473e1098d/apg_guidance.py",
+          "sha256": "0c0ce9755952c99307ecad2fac67863d43258e34541cd37ce2f2221f59e76b15",
+          "bytes": 7956
+        },
+        {
+          "name": "acestep-v15-sft/config.json",
+          "url": "https://huggingface.co/ACE-Step/acestep-v15-sft/resolve/c410d249e71ea9385a7b586865e65b1473e1098d/config.json",
+          "sha256": "9bb4f832f2e5e6c8bf7bddab3c6a6da1b13c01d072efbf0ed3c830536c473359",
+          "bytes": 1940
+        },
+        {
+          "name": "acestep-v15-sft/configuration_acestep_v15.py",
+          "url": "https://huggingface.co/ACE-Step/acestep-v15-sft/resolve/c410d249e71ea9385a7b586865e65b1473e1098d/configuration_acestep_v15.py",
+          "sha256": "b89870c5c7a7ce060eb0bcdbb5ffc86b0b1a324ca325a26be552ea1b42496dc5",
+          "bytes": 13130
+        },
+        {
+          "name": "acestep-v15-sft/model.safetensors",
+          "url": "https://huggingface.co/ACE-Step/acestep-v15-sft/resolve/c410d249e71ea9385a7b586865e65b1473e1098d/model.safetensors",
+          "sha256": "d4dd3a93870f06720027965b90771f529ab02094b3d29e2518f1d5e097e1af7e",
+          "bytes": 4787825604
+        },
+        {
+          "name": "acestep-v15-sft/modeling_acestep_v15_base.py",
+          "url": "https://huggingface.co/ACE-Step/acestep-v15-sft/resolve/c410d249e71ea9385a7b586865e65b1473e1098d/modeling_acestep_v15_base.py",
+          "sha256": "5e3b475d46965dcd5b0d037e53a9af359305a7dbd78e2ee08b39e94c4b02ca48",
+          "bytes": 95910
+        },
+        {
+          "name": "acestep-v15-sft/silence_latent.pt",
+          "url": "https://huggingface.co/ACE-Step/acestep-v15-sft/resolve/c410d249e71ea9385a7b586865e65b1473e1098d/silence_latent.pt",
+          "sha256": "a778e9dd942f5e8b2c09c55370782d318834432b03dabbcdf70e6ed49ad6358b",
+          "bytes": 3841215
+        }
+      ]
+    },
+    {
+      "id": "acestep-v15-xl-turbo",
+      "name": "XL Turbo",
+      "minimumMemoryGB": 32,
+      "steps": 8,
+      "files": [
+        {
+          "name": "acestep-v15-xl-turbo/config.json",
+          "url": "https://huggingface.co/ACE-Step/acestep-v15-xl-turbo/resolve/d4a0b288b83ebb7e25a8c0b32c573c22e134e8ee/config.json",
+          "sha256": "e3665376d46477cbd3e76203cd4e241f11a6a6bb5f88464c49f3c6aae51a918b",
+          "bytes": 2407
+        },
+        {
+          "name": "acestep-v15-xl-turbo/configuration_acestep_v15.py",
+          "url": "https://huggingface.co/ACE-Step/acestep-v15-xl-turbo/resolve/d4a0b288b83ebb7e25a8c0b32c573c22e134e8ee/configuration_acestep_v15.py",
+          "sha256": "0d66f38eba6a3d1665c9449a1a52724d68354477bc88dcf02389640e3602a0c7",
+          "bytes": 13225
+        },
+        {
+          "name": "acestep-v15-xl-turbo/model-00001-of-00004.safetensors",
+          "url": "https://huggingface.co/ACE-Step/acestep-v15-xl-turbo/resolve/d4a0b288b83ebb7e25a8c0b32c573c22e134e8ee/model-00001-of-00004.safetensors",
+          "sha256": "e54a8413c981797312f53d512dec9944023d03f42f0740cbe86f62582cc27bdc",
+          "bytes": 4986971456
+        },
+        {
+          "name": "acestep-v15-xl-turbo/model-00002-of-00004.safetensors",
+          "url": "https://huggingface.co/ACE-Step/acestep-v15-xl-turbo/resolve/d4a0b288b83ebb7e25a8c0b32c573c22e134e8ee/model-00002-of-00004.safetensors",
+          "sha256": "b45f788b6dc9f15957cfa3d9b403f25f3f64c5211ecaf18dda45b67ea6470664",
+          "bytes": 4986942776
+        },
+        {
+          "name": "acestep-v15-xl-turbo/model-00003-of-00004.safetensors",
+          "url": "https://huggingface.co/ACE-Step/acestep-v15-xl-turbo/resolve/d4a0b288b83ebb7e25a8c0b32c573c22e134e8ee/model-00003-of-00004.safetensors",
+          "sha256": "a4f6bd572eab79cf5f3e4678796f904c6d6c33680a3e6ed09034d6de7cabea4d",
+          "bytes": 4986942808
+        },
+        {
+          "name": "acestep-v15-xl-turbo/model-00004-of-00004.safetensors",
+          "url": "https://huggingface.co/ACE-Step/acestep-v15-xl-turbo/resolve/d4a0b288b83ebb7e25a8c0b32c573c22e134e8ee/model-00004-of-00004.safetensors",
+          "sha256": "a868b05493c73808408f58b33a903371bb2846b53c8b19bd7476991bc8837259",
+          "bytes": 4988483464
+        },
+        {
+          "name": "acestep-v15-xl-turbo/model.safetensors.index.json",
+          "url": "https://huggingface.co/ACE-Step/acestep-v15-xl-turbo/resolve/d4a0b288b83ebb7e25a8c0b32c573c22e134e8ee/model.safetensors.index.json",
+          "sha256": "0a0c7e153a7bb6f6061b155739e9502cf83977bb959186d4df688595302a9474",
+          "bytes": 71471
+        },
+        {
+          "name": "acestep-v15-xl-turbo/modeling_acestep_v15_xl_turbo.py",
+          "url": "https://huggingface.co/ACE-Step/acestep-v15-xl-turbo/resolve/d4a0b288b83ebb7e25a8c0b32c573c22e134e8ee/modeling_acestep_v15_xl_turbo.py",
+          "sha256": "6576bd225807998ac169c5a05b86fb778091d5967666cbb417841836bd553ecc",
+          "bytes": 103821
+        },
+        {
+          "name": "acestep-v15-xl-turbo/silence_latent.pt",
+          "url": "https://huggingface.co/ACE-Step/acestep-v15-xl-turbo/resolve/d4a0b288b83ebb7e25a8c0b32c573c22e134e8ee/silence_latent.pt",
+          "sha256": "a778e9dd942f5e8b2c09c55370782d318834432b03dabbcdf70e6ed49ad6358b",
+          "bytes": 3841215
+        }
+      ]
+    },
+    {
+      "id": "acestep-v15-xl-sft",
+      "name": "XL SFT",
+      "minimumMemoryGB": 32,
+      "steps": 50,
+      "files": [
+        {
+          "name": "acestep-v15-xl-sft/apg_guidance.py",
+          "url": "https://huggingface.co/ACE-Step/acestep-v15-xl-sft/resolve/d06de46b4622f781cf07f4a013a67d591ca52819/apg_guidance.py",
+          "sha256": "89ecdc4686e174225d6e6d304939d75892297dc3c19fbb11e04345dc3d4685db",
+          "bytes": 8340
+        },
+        {
+          "name": "acestep-v15-xl-sft/config.json",
+          "url": "https://huggingface.co/ACE-Step/acestep-v15-xl-sft/resolve/d06de46b4622f781cf07f4a013a67d591ca52819/config.json",
+          "sha256": "174cf8c4afc2c41212546b4dca9afb11e7958f8b1e1a770d7cd009a82d72a6f1",
+          "bytes": 2525
+        },
+        {
+          "name": "acestep-v15-xl-sft/configuration_acestep_v15.py",
+          "url": "https://huggingface.co/ACE-Step/acestep-v15-xl-sft/resolve/d06de46b4622f781cf07f4a013a67d591ca52819/configuration_acestep_v15.py",
+          "sha256": "0d66f38eba6a3d1665c9449a1a52724d68354477bc88dcf02389640e3602a0c7",
+          "bytes": 13225
+        },
+        {
+          "name": "acestep-v15-xl-sft/model-00001-of-00004.safetensors",
+          "url": "https://huggingface.co/ACE-Step/acestep-v15-xl-sft/resolve/d06de46b4622f781cf07f4a013a67d591ca52819/model-00001-of-00004.safetensors",
+          "sha256": "1d304b8a34859cd92c349c71ae6c27d50564844c7f7611d2d32913f67508e5a4",
+          "bytes": 4986971456
+        },
+        {
+          "name": "acestep-v15-xl-sft/model-00002-of-00004.safetensors",
+          "url": "https://huggingface.co/ACE-Step/acestep-v15-xl-sft/resolve/d06de46b4622f781cf07f4a013a67d591ca52819/model-00002-of-00004.safetensors",
+          "sha256": "94e33648f514fdd00f473f2d2680af959204b58b15f7ab37246ac16d066aac87",
+          "bytes": 4986942776
+        },
+        {
+          "name": "acestep-v15-xl-sft/model-00003-of-00004.safetensors",
+          "url": "https://huggingface.co/ACE-Step/acestep-v15-xl-sft/resolve/d06de46b4622f781cf07f4a013a67d591ca52819/model-00003-of-00004.safetensors",
+          "sha256": "befe558365f53bc6c44f3f7e521cb2dd026927a817c36aa05ad94fcd80a533a9",
+          "bytes": 4986942808
+        },
+        {
+          "name": "acestep-v15-xl-sft/model-00004-of-00004.safetensors",
+          "url": "https://huggingface.co/ACE-Step/acestep-v15-xl-sft/resolve/d06de46b4622f781cf07f4a013a67d591ca52819/model-00004-of-00004.safetensors",
+          "sha256": "dfbc77aa26e54d0127892d6e7f3c0868bfc4623aa067867f6595c3b2fb7d31a4",
+          "bytes": 4988483464
+        },
+        {
+          "name": "acestep-v15-xl-sft/model.safetensors.index.json",
+          "url": "https://huggingface.co/ACE-Step/acestep-v15-xl-sft/resolve/d06de46b4622f781cf07f4a013a67d591ca52819/model.safetensors.index.json",
+          "sha256": "0a0c7e153a7bb6f6061b155739e9502cf83977bb959186d4df688595302a9474",
+          "bytes": 71471
+        },
+        {
+          "name": "acestep-v15-xl-sft/modeling_acestep_v15_xl_base.py",
+          "url": "https://huggingface.co/ACE-Step/acestep-v15-xl-sft/resolve/d06de46b4622f781cf07f4a013a67d591ca52819/modeling_acestep_v15_xl_base.py",
+          "sha256": "e367811c6d8cd9162e630da86622dd6edc9d5c2b7f605eadd68e69a227c35e88",
+          "bytes": 105981
+        },
+        {
+          "name": "acestep-v15-xl-sft/silence_latent.pt",
+          "url": "https://huggingface.co/ACE-Step/acestep-v15-xl-sft/resolve/d06de46b4622f781cf07f4a013a67d591ca52819/silence_latent.pt",
+          "sha256": "a778e9dd942f5e8b2c09c55370782d318834432b03dabbcdf70e6ed49ad6358b",
+          "bytes": 3841215
+        }
+      ]
+    }
+  ]
+}
