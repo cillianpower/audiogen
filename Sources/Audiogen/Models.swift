@@ -119,8 +119,8 @@ struct AppPaths: Sendable {
     static var standard: Self {
         let home = FileManager.default.homeDirectoryForCurrentUser
         return Self(
-            support: existingDirectory(home: home, path: "Library/Application Support/Audiogen", legacy: "Library/Application Support/GenerativeAudio"),
-            logs: existingDirectory(home: home, path: "Library/Logs/Audiogen", legacy: "Library/Logs/GenerativeAudio")
+            support: stickyDirectory(defaults: .standard, key: "supportDirectory", home: home, path: "Library/Application Support/Audiogen", legacy: "Library/Application Support/GenerativeAudio"),
+            logs: stickyDirectory(defaults: .standard, key: "logDirectory", home: home, path: "Library/Logs/Audiogen", legacy: "Library/Logs/GenerativeAudio")
         )
     }
     static var defaultOutput: URL {
@@ -131,6 +131,16 @@ struct AppPaths: Sendable {
         let current = home.appendingPathComponent(path)
         let previous = home.appendingPathComponent(legacy)
         return !FileManager.default.fileExists(atPath: current.path) && FileManager.default.fileExists(atPath: previous.path) ? previous : current
+    }
+    /// Resolves a storage root once, then reuses that decision for every later launch.
+    /// Without this, creating the newer folder next to an existing legacy one (or the
+    /// reverse) silently redirects the app to an empty directory, so installed engines,
+    /// models and generations all appear to have vanished.
+    static func stickyDirectory(defaults: UserDefaults, key: String, home: URL, path: String, legacy: String) -> URL {
+        if let saved = defaults.string(forKey: key), !saved.isEmpty { return URL(fileURLWithPath: saved) }
+        let chosen = existingDirectory(home: home, path: path, legacy: legacy)
+        defaults.set(chosen.path, forKey: key)
+        return chosen
     }
     func prepare() throws {
         for url in [support, logs, engine, runtime, metadata, references, config, peaks] { try FileManager.default.createDirectory(at: url, withIntermediateDirectories: true) }

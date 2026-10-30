@@ -133,16 +133,25 @@ actor FileVerifier {
     }
     var commonModels: [EngineManifest.Artifact] { manifest.models.filter { !$0.name.hasPrefix("acestep-v15-turbo/") } }
     var installed: Bool { modelInstalled("acestep-v15-turbo") }
+    /// ACE-Step replaces the Python modules inside a checkpoint with its own copies
+    /// the first time it loads a model (`acestep.model_downloader._sync_model_code_files`),
+    /// so their byte sizes stop matching the pinned manifest. Require them to exist,
+    /// but keep exact size checks for weights, configs and tokenizers.
+    static func isEngineRewritten(_ artifact: EngineManifest.Artifact) -> Bool {
+        (artifact.name as NSString).pathExtension.lowercased() == "py"
+    }
+    func artifactInstalled(_ artifact: EngineManifest.Artifact) -> Bool {
+        let path = paths.models.appendingPathComponent(artifact.name).path
+        guard FileManager.default.fileExists(atPath: path) else { return false }
+        if Self.isEngineRewritten(artifact) { return true }
+        return (try? FileManager.default.attributesOfItem(atPath: path)[.size] as? Int64) == artifact.bytes
+    }
     func modelInstalled(_ id: String) -> Bool {
-        guard runtimeInstalled, commonModels.allSatisfy({ artifact in
-            (try? FileManager.default.attributesOfItem(atPath: paths.models.appendingPathComponent(artifact.name).path)[.size] as? Int64) == artifact.bytes
-        }) else { return false }
+        guard runtimeInstalled, commonModels.allSatisfy(artifactInstalled) else { return false }
         let root = paths.models.appendingPathComponent(id)
         if FileManager.default.fileExists(atPath: root.appendingPathComponent(".audiogen-imported").path) { return ACECheckpointImporter.complete(root) }
         let files = id == "acestep-v15-turbo" ? manifest.models.filter { $0.name.hasPrefix(id + "/") } : (try? RuntimeCatalog.bundled())?.aceModels.first { $0.id == id }?.files ?? []
-        return !files.isEmpty && files.allSatisfy { artifact in
-            (try? FileManager.default.attributesOfItem(atPath: paths.models.appendingPathComponent(artifact.name).path)[.size] as? Int64) == artifact.bytes
-        }
+        return !files.isEmpty && files.allSatisfy(artifactInstalled)
     }
     var python: URL { paths.repository.appendingPathComponent(".venv/bin/python") }
     var environment: [String: String] {

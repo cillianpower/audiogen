@@ -3,6 +3,36 @@ import Foundation
 @testable import Audiogen
 
 @MainActor final class RuntimeManagementTests: XCTestCase {
+    func testEngineRewrittenModelCodeKeepsInstalledACECheckpointRecognised() throws {
+        let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        defer { try? FileManager.default.removeItem(at: root) }
+        let paths = AppPaths(support: root, logs: root.appendingPathComponent("logs"))
+        let manifest = try EngineManifest.bundled()
+        let installer = RuntimeInstaller(paths: paths, manifest: manifest)
+        try paths.prepare()
+        try FileManager.default.createDirectory(at: installer.python.deletingLastPathComponent(), withIntermediateDirectories: true)
+        try Data().write(to: installer.python)
+        try FileManager.default.setAttributes([.posixPermissions: 0o755], ofItemAtPath: installer.python.path)
+        try JSONEncoder().encode(manifest).write(to: installer.runtimeMarker)
+        for artifact in manifest.models {
+            let destination = paths.models.appendingPathComponent(artifact.name)
+            try FileManager.default.createDirectory(at: destination.deletingLastPathComponent(), withIntermediateDirectories: true)
+            FileManager.default.createFile(atPath: destination.path, contents: nil)
+            let handle = try FileHandle(forWritingTo: destination)
+            try handle.truncate(atOffset: UInt64(artifact.bytes))
+            try handle.close()
+        }
+        XCTAssertTrue(installer.modelInstalled("acestep-v15-turbo"))
+        // ACE-Step overwrites the checkpoint's Python modules after loading the model.
+        let code = try XCTUnwrap(manifest.models.first { $0.name.hasSuffix("configuration_acestep_v15.py") })
+        try Data("from acestep.models.common.configuration_acestep_v15 import AceStepConfig".utf8)
+            .write(to: paths.models.appendingPathComponent(code.name))
+        XCTAssertTrue(installer.modelInstalled("acestep-v15-turbo"))
+        // Weights are still verified byte for byte.
+        let weights = try XCTUnwrap(manifest.models.first { $0.name.hasSuffix("model.safetensors") })
+        try FileHandle(forWritingTo: paths.models.appendingPathComponent(weights.name)).truncate(atOffset: 1_024)
+        XCTAssertFalse(installer.modelInstalled("acestep-v15-turbo"))
+    }
     func testPartialACECheckpointDoesNotBecomeAvailableDuringDownload() throws {
         let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
         defer { try? FileManager.default.removeItem(at: root) }
