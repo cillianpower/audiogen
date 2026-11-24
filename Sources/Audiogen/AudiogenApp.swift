@@ -91,6 +91,7 @@ import AppKit
     func application(_ application: NSApplication, open urls: [URL]) {
         if let store { store.importAudio(urls) } else { pendingOpen += urls }
     }
+    func applicationDidBecomeActive(_ notification: Notification) { store?.refreshInstallState() }
     func applicationDidFinishLaunching(_ notification: Notification) { NSApp.setActivationPolicy(.regular); NSApp.activate(ignoringOtherApps: true) }
     func installKeyboardMonitor() {
         guard monitor == nil else { return }
@@ -160,6 +161,7 @@ struct EngineSettings: View {
             }
             .sharedBackgroundVisibility(.hidden)
         }
+        .onAppear { store.refreshInstallState() }
         .frame(minWidth: 420, idealWidth: 520, maxWidth: .infinity, minHeight: 340, idealHeight: 560, maxHeight: .infinity)
         .toolbar(removing: .title)
         .toolbarBackgroundVisibility(.hidden, for: .windowToolbar)

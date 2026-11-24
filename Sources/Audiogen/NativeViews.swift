@@ -42,6 +42,9 @@ struct PromptEditor: NSViewRepresentable {
         editor.delegate = context.coordinator
         editor.onFocusChange = { context.coordinator.parent.focusChanged($0) }
         editor.history = history; editor.onAudioDrop = audioDrop
+        // A disabled editor (in a hidden workspace) can't take keyboard focus.
+        let enabled = context.environment.isEnabled
+        if editor.isSelectable != enabled { editor.isEditable = enabled; editor.isSelectable = enabled }
         if editor.string != text, !editor.hasMarkedText() {
             editor.string = text
             editor.setSelectedRange(NSRange(location: (text as NSString).length, length: 0))
@@ -110,7 +113,7 @@ struct NativeWaveform: NSViewRepresentable {
     func sizeThatFits(_ proposal: ProposedViewSize, nsView: WaveformNSView, context: Context) -> CGSize? {
         CGSize(width: proposal.width ?? 600, height: proposal.height ?? 240)
     }
-    func updateNSView(_ view: WaveformNSView, context: Context) { view.player = player; view.needsDisplay = true }
+    func updateNSView(_ view: WaveformNSView, context: Context) { view.player = player; view.isEnabled = context.environment.isEnabled; view.needsDisplay = true }
 }
 final class AudioPromise: NSFilePromiseProvider {
     let source: URL
@@ -124,12 +127,14 @@ final class AudioPromise: NSFilePromiseProvider {
 }
 final class WaveformNSView: NSView, NSDraggingSource {
     var player: AudioPlayer?
+    /// False in a hidden workspace, so Tab skips it and the arrow keys can't move a player you can't see.
+    var isEnabled = true
     private var anchor: Double?
     private var downPoint: NSPoint?
     /// The fixed end of a selection made with Shift-arrow keys.
     private var keyAnchor: Double?
     override var isFlipped: Bool { true }
-    override var acceptsFirstResponder: Bool { true }
+    override var acceptsFirstResponder: Bool { isEnabled }
     override var focusRingMaskBounds: NSRect { bounds }
     override func drawFocusRingMask() { NSBezierPath(roundedRect: bounds.insetBy(dx: 2, dy: 2), xRadius: 6, yRadius: 6).fill() }
     override func becomeFirstResponder() -> Bool { needsDisplay = true; return super.becomeFirstResponder() }

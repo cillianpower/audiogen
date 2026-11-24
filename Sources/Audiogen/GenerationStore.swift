@@ -64,6 +64,10 @@ import Observation
     }
     /// Goes up when models are imported or removed outside a download.
     private(set) var installEpoch = 0
+    /// Checks the disk again on the next ask. Model files can change outside the app (Settings
+    /// offers "Show Files in Finder"), so this runs when the app comes to the front, when Settings
+    /// opens and after a generation fails.
+    func refreshInstallState() { installEpoch += 1 }
     @ObservationIgnored private var installCache: [String: Bool] = [:]
     @ObservationIgnored private var installCacheStamp: [Int] = []
     func runtimeInstalled(_ id: EngineID) -> Bool {
@@ -399,7 +403,7 @@ import Observation
                     finished.append(generations.first { $0.id == item.id }?.name ?? item.name)
                 } catch is CancellationError { update(item.id) { $0.state = .cancelled } }
                 catch {
-                    if !Task.isCancelled { update(item.id) { $0.state = .failed; $0.error = error.localizedDescription }; self.error = error.localizedDescription; failed += 1 }
+                    if !Task.isCancelled { update(item.id) { $0.state = .failed; $0.error = error.localizedDescription }; self.error = error.localizedDescription; failed += 1; refreshInstallState() }
                 }
                 jobProgress[item.id] = nil; jobStarted[item.id] = nil
                 activeID = nil; activeEngine = nil

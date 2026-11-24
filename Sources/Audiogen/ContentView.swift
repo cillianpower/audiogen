@@ -14,7 +14,11 @@ struct ContentView: View {
         }
         .ignoresSafeArea(.container, edges: .top)
         // A view left behind keeps keyboard focus, so typing would go to a hidden prompt.
-        .onChange(of: store.workspace) { NSApp.keyWindow?.makeFirstResponder(nil) }
+        .onChange(of: store.workspace) {
+            NSApp.keyWindow?.makeFirstResponder(nil)
+            // Each workspace has its own minimum; a window sized for one may be too narrow for the next.
+            GenerationWorkspaceView.widenWindow(to: minimumWidth)
+        }
         .toolbar(removing: .title)
         .toolbarBackgroundVisibility(.hidden, for: .windowToolbar)
         .onChange(of: store.activity) { _, activity in DockActivity.update(activity) }
@@ -29,7 +33,11 @@ struct ContentView: View {
             layer(.transform) { ProcessingWorkspaceView(store: store, engine: .after, isActive: store.workspace == .transform).safeAreaPadding(.top, TopBar.height) }
         }
         // Generate needs room for its columns; Extract and Transform for two audio cards side by side.
-        .frame(minWidth: store.workspace == .generate ? (store.inspectorVisible ? GenerationWorkspaceView.minimumWidthWithInspector : 740) : 860, minHeight: 590)
+        .frame(minWidth: minimumWidth, minHeight: 590)
+    }
+
+    private var minimumWidth: CGFloat {
+        store.workspace == .generate ? (store.inspectorVisible ? GenerationWorkspaceView.minimumWidthWithInspector : 740) : 860
     }
 
     private func layer<Content: View>(_ workspace: AudioWorkspace, @ViewBuilder content: () -> Content) -> some View {
@@ -38,6 +46,8 @@ struct ContentView: View {
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .opacity(isActive ? 1 : 0)
             .allowsHitTesting(isActive)
+            // Disabled, so Tab can't move focus into a workspace you can't see.
+            .disabled(!isActive)
             .accessibilityHidden(!isActive)
             .zIndex(isActive ? 1 : 0)
             .animation(.easeOut(duration: 0.18), value: isActive)
@@ -53,6 +63,13 @@ struct GenerationWorkspaceView: View {
     @State private var showAdvanced = false
     @Environment(\.undoManager) private var undoManager
     static let minimumWidthWithInspector: CGFloat = 990
+    /// Widens the main window to `width` if it's narrower, keeping it on screen.
+    static func widenWindow(to width: CGFloat) {
+        guard let window = NSApp.windows.first(where: { $0.title == "Audiogen" && $0.isVisible }), window.frame.width < width else { return }
+        var frame = window.frame; frame.size.width = width
+        if let screen = window.screen?.visibleFrame, frame.maxX > screen.maxX { frame.origin.x = max(screen.minX, screen.maxX - frame.width) }
+        window.setFrame(frame, display: true, animate: true)
+    }
     @State private var composerFullWidth: CGFloat = 0
     @State private var composerWidth: CGFloat = .infinity
     var body: some View {
@@ -151,12 +168,7 @@ struct GenerationWorkspaceView: View {
         // Any toggle animates: the bar button, ⌘I or the View menu.
         .animation(Motion.page, value: store.inspectorVisible)
         // The window widens if the inspector opens in a narrow window. ContentView sets the minimums.
-        .onChange(of: store.inspectorVisible) { _, visible in
-            guard visible, let window = NSApp.windows.first(where: { $0.title == "Audiogen" && $0.isVisible }), window.frame.width < Self.minimumWidthWithInspector else { return }
-            var frame = window.frame; frame.size.width = Self.minimumWidthWithInspector
-            if let screen = window.screen?.visibleFrame, frame.maxX > screen.maxX { frame.origin.x = max(screen.minX, screen.maxX - frame.width) }
-            window.setFrame(frame, display: true, animate: true)
-        }
+        .onChange(of: store.inspectorVisible) { _, visible in if visible { Self.widenWindow(to: Self.minimumWidthWithInspector) } }
         .alert("Audiogen", isPresented: Binding(get: { store.error != nil }, set: { if !$0 { store.error = nil } })) {
             if store.installed && !store.engineBusy && store.jobs.isEmpty { Button("Restart Engine") { store.restartEngine() } }
             Button("Show Technical Details") { store.reveal(store.paths.logs) }
@@ -384,9 +396,11 @@ struct GenerationWorkspaceView: View {
                     }
                     Text("Constraints are applied to backend conditioning. Results may still contain unwanted sounds.").font(.caption).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
                 }
-                ClickableDisclosure("Advanced", isExpanded: $showAdvanced) {
+                ClickableDisclosure(isExpanded: $showAdvanced) {
                     Stepper("Steps: \(store.steps)", value: $store.steps, in: store.selectedEngine == .miniMax ? 2...100 : 1...100).padding(.top, 6)
-                }.font(.caption.weight(.semibold)).foregroundStyle(.secondary)
+                } label: {
+                    Text("Advanced").font(.caption.weight(.semibold)).foregroundStyle(.secondary)
+                }
                 if let selected = store.selected, selected.isImported {
                     InspectorSection("Selected Audio") {
                         inspectorRow("Imported") { Text(selected.created.formatted(date: .abbreviated, time: .shortened)).foregroundStyle(.secondary) }

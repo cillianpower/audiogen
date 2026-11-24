@@ -89,9 +89,22 @@ struct TopBar: View {
             .help("Show or hide the inspector (⌘I)")
     }
 
-    /// The engine as plain text with a menu. A starting engine shows a small spinner; one that
-    /// needs something (a model, a restart) shows an icon that opens Settings, with the status as
-    /// its tooltip, instead of a sentence in the bar.
+    private func statusIcon(_ symbol: String) -> some View {
+        Image(systemName: symbol).font(.system(size: 12)).frame(width: 22, height: 22).contentShape(.rect)
+    }
+
+    /// The engine as plain text with a menu. While it works it shows a small spinner; when a model
+    /// is missing, an icon that opens Settings; when it has stopped, an icon that restarts it.
+    private enum EngineCondition { case fine, working, needsModel, stopped }
+    /// Only real problems get an icon. The queue sets its own status while it works ("Preparing…",
+    /// "Generating · …"), which is progress, not trouble.
+    private var condition: EngineCondition {
+        if store.engineStatus == "Available" { return .fine }
+        if store.engineStatus == "Stopped", store.installed { return .stopped }
+        if store.engineBusy || !store.jobs.isEmpty { return .working }
+        return store.installed ? .fine : .needsModel
+    }
+
     private var engine: some View {
         HStack(spacing: 6) {
             Picker("Engine", selection: Binding(get: { store.selectedEngine }, set: store.selectEngine)) {
@@ -100,18 +113,23 @@ struct TopBar: View {
             .labelsHidden().pickerStyle(.menu).buttonStyle(.borderless).fixedSize()
             .font(.system(size: 12, weight: .medium))
             .disabled(!store.canSwitchEngine).help("Generation engine")
-            if store.engineBusy {
+            switch condition {
+            case .fine: EmptyView()
+            case .working:
+                // A spinner only, with the status as its tooltip, so the tabs never shift as it changes.
                 ProgressView().controlSize(.mini)
                     .help(store.engineStatus).accessibilityLabel(store.engineStatus)
-            } else if store.engineStatus != "Available" {
-                SettingsButton {
-                    Image(systemName: "exclamationmark.circle").font(.system(size: 12))
-                        .frame(width: 22, height: 22).contentShape(.rect)
-                }
-                .buttonStyle(BarPressStyle())
-                .foregroundStyle(.secondary)
-                .help(store.engineStatus)
-                .accessibilityLabel(store.engineStatus)
+            case .needsModel:
+                SettingsButton { statusIcon("exclamationmark.circle") }
+                    .buttonStyle(BarPressStyle()).foregroundStyle(.secondary)
+                    .help("\(store.engineStatus). Click to open Settings.")
+                    .accessibilityLabel(store.engineStatus)
+            case .stopped:
+                Button { store.restartEngine() } label: { statusIcon("arrow.clockwise.circle") }
+                    .buttonStyle(BarPressStyle()).foregroundStyle(.secondary)
+                    .disabled(store.engineBusy || !store.jobs.isEmpty)
+                    .help("The engine stopped. Click to restart it.")
+                    .accessibilityLabel("Restart engine")
             }
         }
     }
@@ -195,18 +213,41 @@ private struct BarPressStyle: ButtonStyle {
 
 /// Drags the window, and double-clicks the way the user has chosen for title bars.
 struct WindowDragArea: View {
+    @State private var window: NSWindow?
     var body: some View {
         Color.clear
             .contentShape(.rect)
+            .background(WindowReader { window = $0 })
             .gesture(WindowDragGesture())
             .allowsWindowActivationEvents(true)
             .onTapGesture(count: 2) {
-                guard let window = NSApp.keyWindow else { return }
+                guard let window = window ?? NSApp.keyWindow else { return }
+                // Desktop & Dock › "Double-click a window's title bar to". Unset means the system
+                // default, Fill.
                 switch UserDefaults.standard.string(forKey: "AppleActionOnDoubleClick") {
                 case "Minimize": window.miniaturize(nil)
                 case "None": break
-                default: window.zoom(nil)
+                case "Maximize": window.zoom(nil)
+                default:
+                    if let screen = window.screen?.visibleFrame { window.setFrame(screen, display: true, animate: true) }
                 }
             }
+    }
+}
+
+/// Reports the window a view is in, so actions go to that window rather than whichever is key.
+private struct WindowReader: NSViewRepresentable {
+    let found: (NSWindow?) -> Void
+    func makeNSView(context: Context) -> NSView { Probe(found: found) }
+    func updateNSView(_ view: NSView, context: Context) {}
+    final class Probe: NSView {
+        let found: (NSWindow?) -> Void
+        init(found: @escaping (NSWindow?) -> Void) { self.found = found; super.init(frame: .zero) }
+        required init?(coder: NSCoder) { nil }
+        override func viewDidMoveToWindow() {
+            super.viewDidMoveToWindow()
+            let window = window
+            DispatchQueue.main.async { [found] in found(window) }
+        }
     }
 }
