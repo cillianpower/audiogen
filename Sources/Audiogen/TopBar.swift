@@ -67,7 +67,7 @@ struct TopBar: View {
         .background { WindowDragArea() }
     }
 
-    private static let space = "TopBar"
+    private nonisolated static let space = "TopBar"
 
     /// The window's centre, unless the window is too narrow for that: then just clear of the engine
     /// menu on the left and the inspector toggle on the right.
