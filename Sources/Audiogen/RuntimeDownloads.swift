@@ -18,6 +18,8 @@ import Observation
 /// independently of one another and independently of the generation queue.
 @MainActor @Observable final class RuntimeDownloads {
     var records: [String: RuntimeDownload] = [:]
+    /// Goes up whenever a download finishes or stops, so cached install checks know to look again.
+    private(set) var settledCount = 0
     private var tasks: [String: Task<Void, Never>] = [:]
     private var tails: [EngineID: Task<Void, Never>] = [:]
     func record(_ engine: EngineID, model: String) -> RuntimeDownload? { records["\(engine.rawValue)/\(model)"] }
@@ -43,6 +45,7 @@ import Observation
                 record.error = Task.isCancelled || error is CancellationError ? nil : error.localizedDescription
                 record.status = Task.isCancelled ? "Paused · Resume when ready" : "Interrupted · Resume to retry"
             }
+            settledCount += 1
             if records[record.id] === record { tasks[record.id] = nil }
         }
         tasks[record.id] = task; tails[engine] = task

@@ -239,6 +239,26 @@ extension ClickableDisclosure where Label == Text {
     }
 }
 
+/// An empty area that opens a file chooser when clicked, alongside accepting drops, so it needs
+/// no separate "Choose…" button.
+struct ChooseOrDropArea<Content: View>: View {
+    let help: String
+    let action: () -> Void
+    @ViewBuilder let content: () -> Content
+    @State private var isHovering = false
+    var body: some View {
+        Button(action: action) {
+            content()
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .contentShape(.rect)
+                .background(RoundedRectangle(cornerRadius: 10, style: .continuous).fill(.primary.opacity(isHovering ? 0.05 : 0)))
+        }
+        .buttonStyle(.plain)
+        .help(help)
+        .onHover { hovering in withAnimation(Motion.hover) { isHovering = hovering } }
+    }
+}
+
 /// Accepts dropped files and highlights itself while a drag is over it.
 private struct AudioDropZone: ViewModifier {
     let title: String

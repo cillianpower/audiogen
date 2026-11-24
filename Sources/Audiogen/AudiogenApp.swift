@@ -14,6 +14,8 @@ import AppKit
         // bar's + button made more, so launch opens exactly one window and tabs are off.
         UserDefaults.standard.register(defaults: ["ApplePersistenceIgnoreState": true])
         NSWindow.allowsAutomaticWindowTabbing = false
+        // Left by the Standard/Glass picker, which is gone: glass is the only appearance now.
+        UserDefaults.standard.removeObject(forKey: "appearance")
     }
     var body: some Scene {
         WindowGroup("Audiogen") {
@@ -22,6 +24,7 @@ import AppKit
         // The window's controls live in TopBar, a slim strip beside the traffic lights.
         .windowStyle(.hiddenTitleBar)
         .commands {
+            CommandGroup(replacing: .appSettings) { SettingsButton { Text("Settings…") }.keyboardShortcut(",") }
             CommandGroup(replacing: .newItem) {
                 Button(store.workspace == .generate ? "Import Audio…" : "Import Source Audio…") {
                     if let id = store.workspace.runtime { store.processing.chooseInput(id) } else { store.chooseImport() }
@@ -54,14 +57,21 @@ import AppKit
                 ForEach(EngineID.generationCases) { id in Button(id.name) { store.selectEngine(id) }.disabled(!store.canSwitchEngine) }
                 Divider()
                 Button("Restart Engine") { store.restartEngine() }.disabled(!store.installed || store.engineBusy || !store.jobs.isEmpty)
-                SettingsLink { Text("Engine Manager…") }
+                SettingsButton { Text("Engine Manager…") }
             }
             CommandGroup(after: .sidebar) {
                 Button("Toggle Inspector") { store.inspectorVisible.toggle() }.keyboardShortcut("i")
                 Button("Show Queue") { store.showQueue.toggle() }
             }
         }
-        Settings { EngineSettings(store: store) }
+        // A regular window rather than a Settings scene, which SwiftUI keeps at a fixed size. It is
+        // small by default and resizes down to 420 × 340: it often sits beside the main window
+        // while models download.
+        Window("Settings", id: EngineSettings.windowID) { EngineSettings(store: store) }
+            .windowToolbarStyle(.unifiedCompact(showsTitle: false))
+            .defaultSize(width: 520, height: 560)
+            .windowResizability(.contentMinSize)
+            .commandsRemoved()
     }
     private var exportableCount: Int {
         if let runtime = store.workspace.runtime { return store.processing.record(store.processing.draft(runtime))?.outputs.count ?? 0 }
@@ -107,7 +117,15 @@ import AppKit
     func applicationWillTerminate(_ notification: Notification) { store?.shutdown(); if let monitor { NSEvent.removeMonitor(monitor) } }
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool { true }
 }
+/// Opens the Settings window, in place of SwiftUI's SettingsLink.
+struct SettingsButton<Label: View>: View {
+    @Environment(\.openWindow) private var openWindow
+    @ViewBuilder let label: () -> Label
+    var body: some View { Button(action: { openWindow(id: EngineSettings.windowID) }, label: label) }
+}
+
 struct EngineSettings: View {
+    static let windowID = "settings"
     @Bindable var store: GenerationStore
     @State private var expanded: Set<EngineID>
     @State private var uninstallTarget: EngineID?
@@ -117,37 +135,34 @@ struct EngineSettings: View {
         _expanded = State(initialValue: [])
     }
 
-    var body: some View {
-        TabView {
-            ScrollView {
-                VStack(alignment: .leading, spacing: 16) {
-                    VStack(alignment: .leading, spacing: 6) {
-                        Text("Runtimes & Models").font(.title2.weight(.semibold))
-                        Text("Download models here, then choose one in its workspace. Downloads can continue while you process audio.")
-                            .foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
-                    }.padding(.bottom, 4)
-                    ForEach(EngineID.allCases) { id in runtimeCard(id) }
-                }.padding(24)
-            }
-                .tabItem { Label("Runtimes", systemImage: "cpu") }
+    enum Pane: String, CaseIterable { case runtimes = "Runtimes", general = "General" }
+    @State private var pane = Pane.runtimes
 
-            Form {
-                Section("Audio Library") {
-                    LabeledContent("Save audio to") {
-                        Text(store.outputDirectory.path).textSelection(.enabled)
-                            .lineLimit(2).truncationMode(.middle).foregroundStyle(.secondary)
-                    }
-                    Button("Change Folder…") { store.chooseOutputDirectory() }
-                    Text("Renaming a generation also renames its WAV. Removing it from the library keeps the file on disk.")
-                        .font(.caption).foregroundStyle(.secondary)
-                }
-                Section("Diagnostics") {
-                    LabeledContent("Runtime logs") {
-                        Button("Show in Finder") { store.reveal(store.paths.logs) }
+    var body: some View {
+        // The tabs live in a compact toolbar beside the traffic lights, in the main window's style.
+        // A real toolbar, because macOS gives clicks in the title bar area to the title bar first:
+        // as plain content there, quick clicks between tabs went to window dragging instead.
+        VStack(spacing: 0) {
+            ScrollView {
+                Group {
+                    switch pane {
+                    case .runtimes: runtimes
+                    case .general: general
                     }
                 }
-            }.formStyle(.grouped).clearScrollBackground().tabItem { Label("General", systemImage: "gearshape") }
-        }.frame(width: 700, height: 650)
+                .padding(.horizontal, 14).padding(.top, 4).padding(.bottom, 14)
+                .buttonStyle(.glass).controlSize(.small)
+            }
+        }
+        .toolbar {
+            ToolbarItem(placement: .principal) {
+                BarTabs(label: "Settings", selection: $pane, options: Pane.allCases) { $0.rawValue }.fixedSize()
+            }
+            .sharedBackgroundVisibility(.hidden)
+        }
+        .frame(minWidth: 420, idealWidth: 520, maxWidth: .infinity, minHeight: 340, idealHeight: 560, maxHeight: .infinity)
+        .toolbar(removing: .title)
+        .toolbarBackgroundVisibility(.hidden, for: .windowToolbar)
         .windowGlass()
         .confirmationDialog("Uninstall \(uninstallTarget?.name ?? "runtime") and its model files? Generated audio will be kept.", isPresented: Binding(get: { uninstallTarget != nil }, set: { if !$0 { uninstallTarget = nil } })) {
             if let target = uninstallTarget {
@@ -156,17 +171,83 @@ struct EngineSettings: View {
         }
     }
 
+    /// Every engine in one glass list, a row each, expanding in place to show its models.
+    private var runtimes: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Download a model here, then choose it in its workspace. Downloads continue while you work.")
+                .font(.caption).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
+            VStack(spacing: 0) {
+                ForEach(Array(EngineID.allCases.enumerated()), id: \.element) { index, id in
+                    if index > 0 { GlassRule() }
+                    runtimeCard(id)
+                }
+            }
+            .panel(cornerRadius: 12)
+        }
+    }
+
+    private var general: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            settingsCard("Audio Library") {
+                // The folder is the control: click it to choose another.
+                Button { store.chooseOutputDirectory() } label: {
+                    Label { Text(store.outputDirectory.path).lineLimit(2).truncationMode(.middle).multilineTextAlignment(.leading) } icon: { Image(systemName: "folder") }
+                        .font(.callout).foregroundStyle(.secondary)
+                }
+                .buttonStyle(.plain).pointerStyle(.link)
+                .help("Choose another folder")
+                Text("Renaming a generation also renames its WAV. Removing it from the library keeps the file on disk.")
+                    .font(.caption).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
+            }
+            settingsCard("Runtime Logs") {
+                HStack(spacing: 12) {
+                    Text("Engine output, useful when a generation or download fails.")
+                        .font(.caption).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
+                    Spacer(minLength: 0)
+                    Button("Show in Finder") { store.reveal(store.paths.logs) }
+                }
+            }
+        }
+    }
+
+    /// A titled glass card.
+    private func settingsCard<Content: View>(_ title: String, @ViewBuilder content: () -> Content) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text(title).font(.callout.weight(.semibold))
+            content()
+        }
+        .padding(12).frame(maxWidth: .infinity, alignment: .leading).panel(cornerRadius: 12)
+    }
+
+    /// One engine: name, a one-line description and how many models are installed. Clicking the
+    /// row shows its models and runtime underneath.
     private func runtimeCard(_ id: EngineID) -> some View {
         let models = store.models(for: id)
         let installedCount = models.filter { store.modelInstalled(id, model: $0.id) }.count
-        return VStack(alignment: .leading, spacing: 14) {
-            HStack(alignment: .top) {
-                VStack(alignment: .leading, spacing: 5) {
-                    Text(id.name).font(.headline)
-                    Text(description(id)).font(.callout).foregroundStyle(.secondary)
-                        .fixedSize(horizontal: false, vertical: true)
+        let isExpanded = expanded.contains(id)
+        return VStack(alignment: .leading, spacing: 0) {
+            HStack(spacing: 8) {
+                Button {
+                    withAnimation(Motion.page) { if isExpanded { expanded.remove(id) } else { expanded.insert(id) } }
+                } label: {
+                    HStack(spacing: 8) {
+                        Image(systemName: "chevron.right").font(.caption2.weight(.bold)).foregroundStyle(.secondary)
+                            .rotationEffect(.degrees(isExpanded ? 90 : 0)).frame(width: 12)
+                        VStack(alignment: .leading, spacing: 1) {
+                            Text(id.name).font(.callout.weight(.semibold))
+                            Text(description(id)).font(.caption).foregroundStyle(.secondary).lineLimit(isExpanded ? 3 : 1)
+                        }
+                        Spacer(minLength: 8)
+                        Label(store.downloads.active(id) ? "Downloading" : "\(installedCount) of \(models.count)",
+                              systemImage: store.downloads.active(id) ? "arrow.down.circle" : installedCount > 0 ? "checkmark.circle" : "circle")
+                            .font(.caption).foregroundStyle(.secondary).fixedSize()
+                    }
+                    .contentShape(.rect)
                 }
-                Spacer(minLength: 16)
+                .buttonStyle(.plain)
+                .help(description(id))
+                .accessibilityLabel("\(id.name), \(installedCount) of \(models.count) models installed")
+                .accessibilityHint(isExpanded ? "Hides models" : "Shows models")
                 Menu {
                     Button("Show Files in Finder") { store.reveal(store.engine(for: id).directory) }
                     if id == .ace { Button("Import Local Checkpoint…") { store.importACEModel() } }
@@ -174,36 +255,28 @@ struct EngineSettings: View {
                     Button("Uninstall…", role: .destructive) { uninstallTarget = id }
                         .disabled(!store.runtimeInstalled(id) || store.downloads.active(id) || store.processing.busy(id) || store.engineBusy || store.jobs.contains { $0.resolvedEngineID == id })
                 } label: { Image(systemName: "ellipsis") }
-                    .menuStyle(.borderlessButton).fixedSize().help("\(id.name) options")
+                    .menuStyle(.borderlessButton).menuIndicator(.hidden).fixedSize().help("\(id.name) options")
             }
-            ClickableDisclosure(isExpanded: Binding(get: { expanded.contains(id) }, set: { if $0 { expanded.insert(id) } else { expanded.remove(id) } })) {
+            .padding(.horizontal, 12).padding(.vertical, 8)
+            if isExpanded {
                 VStack(alignment: .leading, spacing: 0) {
                     ForEach(models) { model in
-                        Divider().padding(.vertical, 12)
-                        modelRow(model, engine: id)
+                        GlassRule()
+                        modelRow(model, engine: id).padding(.vertical, 8)
                     }
-                    Divider().padding(.vertical, 12)
-                    runtimeRow(id)
+                    GlassRule()
+                    runtimeRow(id).padding(.vertical, 8)
                     if id == .musicGen {
                         Link("Model license: CC BY-NC 4.0", destination: URL(string: "https://github.com/facebookresearch/audiocraft/blob/main/LICENSE_weights")!)
-                            .font(.caption).padding(.top, 12)
+                            .font(.caption).padding(.bottom, 8)
                     }
                 }
-            } label: {
-                HStack {
-                    Text("Models").font(.callout.weight(.medium))
-                    Spacer()
-                    Label(store.downloads.active(id) ? "Download in progress" : installedCount > 0 ? "\(installedCount) of \(models.count) installed" : "None installed",
-                          systemImage: store.downloads.active(id) ? "arrow.down.circle" : installedCount > 0 ? "checkmark.circle" : "circle")
-                        .font(.caption).foregroundStyle(.secondary)
-                }
+                .padding(.leading, 32).padding(.trailing, 12)
+                .transition(.opacity)
             }
         }
-        .padding(18)
-        .panel()
         .onChange(of: store.downloads.active(id)) { _, active in if active { expanded.insert(id) } }
     }
-
 
     private func modelRow(_ model: RuntimeModel, engine id: EngineID) -> some View {
         let task = store.downloads.record(id, model: model.id)

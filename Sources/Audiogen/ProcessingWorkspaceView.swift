@@ -4,6 +4,8 @@ import UniformTypeIdentifiers
 struct ProcessingWorkspaceView: View {
     @Bindable var store: GenerationStore
     let engine: EngineID
+    /// Extract and Transform both stay built; only the one showing presents alerts.
+    var isActive = true
     @State private var showAdvanced = false
     @State private var showHistory = true
     @Environment(\.undoManager) private var undoManager
@@ -22,7 +24,6 @@ struct ProcessingWorkspaceView: View {
                         Text(engine.name).font(.caption).foregroundStyle(.tertiary)
                     }
                     Spacer()
-                    SettingsLink { Label("Models & Downloads", systemImage: "arrow.down.circle") }.buttonStyle(.glass)
                 }
                 if engine == .sam {
                     inputCard(reference: false)
@@ -71,7 +72,7 @@ struct ProcessingWorkspaceView: View {
                         Text((draft.sourceChannels > 1 && draft.stereo ? "Each channel is processed separately, so this takes about twice as long." : "Exports mono audio at the model's native sample rate.") + (engine == .after ? " Choose a model matching the reference's sound family." : ""))
                             .font(.caption).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
                         if !store.modelInstalled(engine, model: draft.model) {
-                            SettingsLink { Text("Download this model in Settings…") }.font(.callout)
+                            SettingsButton { Text("Download this model in Settings…") }.buttonStyle(.link).font(.callout)
                         }
                     }
                     Spacer()
@@ -143,8 +144,7 @@ struct ProcessingWorkspaceView: View {
                 }
             }.padding(28).frame(maxWidth: 1100).frame(maxWidth: .infinity)
         }
-        .frame(minWidth: 860, minHeight: 590)
-        .alert("Audio Processing", isPresented: Binding(get: { processing.error != nil }, set: { if !$0 { processing.error = nil } })) {
+        .alert("Audio Processing", isPresented: Binding(get: { isActive && processing.error != nil }, set: { if !$0 { processing.error = nil } })) {
             Button("Show Logs") { processing.reveal(store.paths.logs) }
             Button("OK", role: .cancel) { processing.error = nil }
         } message: { Text(processing.error ?? "") }
@@ -152,14 +152,16 @@ struct ProcessingWorkspaceView: View {
     private func inputCard(reference: Bool) -> some View {
         let player = reference ? draft.referencePlayer : draft.sourcePlayer
         let url = reference ? draft.reference : draft.source
+        let choose = { processing.chooseInput(engine, reference: reference) }
+        // The card is the target: click it (or, once loaded, the file name) to choose a file, or drop one on it.
         return VStack(alignment: .leading, spacing: 10) {
-            HStack {
-                Text(reference ? "Timbre reference" : "Source audio").font(.headline)
-                Spacer()
-                Button(url == nil ? "Choose Audio…" : "Replace…") { processing.chooseInput(engine, reference: reference) }
-            }
+            Text(reference ? "Timbre reference" : "Source audio").font(.headline)
             if let url {
-                Text(url.deletingPathExtension().lastPathComponent).font(.callout).foregroundStyle(.secondary).lineLimit(1)
+                Button(action: choose) {
+                    Text(url.deletingPathExtension().lastPathComponent).font(.callout).foregroundStyle(.secondary).lineLimit(1)
+                }
+                .buttonStyle(.plain).pointerStyle(.link)
+                .help("Choose another file, or drop one on this card")
                 NativeWaveform(player: player).frame(height: engine == .sam ? 150 : 120)
                 HStack {
                     Button { let playing = player.isPlaying; draft.pausePlayers(); if !playing { player.toggle() } } label: { Label(player.isPlaying ? "Pause" : "Play", systemImage: player.isPlaying ? "pause.fill" : "play.fill") }
@@ -169,12 +171,16 @@ struct ProcessingWorkspaceView: View {
                     if let message = player.error { Text(message).font(.caption).foregroundStyle(.red) }
                 }
             } else {
-                VStack(spacing: 10) {
-                    Image(systemName: "waveform.badge.plus").font(.title2).foregroundStyle(.secondary)
-                    Text(reference ? "Drop a reference up to 30 seconds" : "Drop audio here").foregroundStyle(.secondary)
-                }.frame(maxWidth: .infinity).frame(height: engine == .sam ? 180 : 160)
+                ChooseOrDropArea(help: "Choose an audio file, or drop one here", action: choose) {
+                    VStack(spacing: 10) {
+                        Image(systemName: "waveform.badge.plus").font(.title2).foregroundStyle(.secondary)
+                        Text(reference ? "Drop a reference up to 30 seconds, or click to choose" : "Drop audio here, or click to choose").foregroundStyle(.secondary)
+                    }
+                }
+                .frame(height: engine == .sam ? 180 : 160)
             }
         }.padding(16).panel()
+            .contextMenu { Button(url == nil ? "Choose Audio…" : "Choose Another File…", action: choose) }
             .dropDestination(for: URL.self) { urls, _ in guard let url = urls.first else { return false }; processing.importInput(url, engine: engine, reference: reference); return true }
     }
     private func resultPanel(_ item: ProcessingRecord) -> some View {

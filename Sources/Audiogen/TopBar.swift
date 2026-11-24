@@ -7,10 +7,11 @@ struct BarColumns: Equatable {
     var detailMaxX: CGFloat?
 }
 
-/// One slim strip across the top of the window, as in Stereo, Obsidian and WhatsApp. Each column
-/// owns the part of the strip above it: the sidebar holds the traffic lights and its toggle, the main
-/// column holds the engine and the workspace tabs, and the inspector holds its own toggle. The title
-/// bar is hidden, so empty parts of the strip move the window.
+/// One slim strip across the top of the window, as in Stereo, Obsidian and WhatsApp. The controls
+/// sit over their own columns: the traffic lights and sidebar toggle over the sidebar, the engine at
+/// the start of the main column, and the inspector toggle at the right edge. The workspace tabs are
+/// centred in the window, so they stay put whichever workspace or panes are showing. The title bar
+/// is hidden, so empty parts of the strip move the window.
 struct TopBar: View {
     @Bindable var store: GenerationStore
     @Binding var sidebar: NavigationSplitViewVisibility
@@ -18,53 +19,63 @@ struct TopBar: View {
     static let height: CGFloat = 32
     /// Room for the close, minimize and zoom buttons.
     private static let trafficLights: CGFloat = 76
+    /// Where Generate's leading controls end, and how wide the tabs are, so the tabs can keep clear.
+    @State private var leadingEnd: CGFloat = 0
+    @State private var tabsWidth: CGFloat = 0
 
     var body: some View {
         GeometryReader { geometry in
             let width = geometry.size.width
+            // The layout follows Generate's columns in every workspace; Generate's own controls fade
+            // out elsewhere, so nothing else in the bar shifts when you switch.
             let generate = store.workspace == .generate
-            let minX = generate ? min(max(columns.detailMinX, 0), width) : 0
-            let maxX = generate ? min(max(columns.detailMaxX ?? width, minX), width) : width
+            let minX = min(max(columns.detailMinX, 0), width)
             let sidebarShown = minX > 1
-            HStack(spacing: 0) {
-                if sidebarShown {
-                    HStack(spacing: 0) {
-                        Spacer(minLength: Self.trafficLights)
-                        sidebarToggle
-                    }
-                    .padding(.trailing, 8)
-                    .frame(width: minX)
-                }
-                // The two sides share the leftover width equally, so the tabs stay centred over the
-                // main column, and the engine menu sits at its leading edge, never closer than 16 pt.
-                HStack(spacing: 16) {
-                    HStack(spacing: 4) {
-                        if generate {
-                            if !sidebarShown { sidebarToggle }
-                            engine
+            ZStack(alignment: .topLeading) {
+                HStack(spacing: 0) {
+                    if sidebarShown {
+                        HStack(spacing: 0) {
+                            Spacer(minLength: Self.trafficLights)
+                            sidebarToggle.generateOnly(generate)
                         }
-                    }
-                    .padding(.leading, sidebarShown ? 12 : Self.trafficLights)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    WorkspaceTabs(selection: $store.workspace).fixedSize()
-                    HStack(spacing: 0) { if generate && maxX >= width - 1 { inspectorToggle } }
-                        .frame(maxWidth: .infinity, alignment: .trailing)
-                }
-                .padding(.trailing, 8)
-                .frame(width: maxX - minX)
-                if maxX < width - 1 {
-                    HStack(spacing: 0) { Spacer(minLength: 0); inspectorToggle }
                         .padding(.trailing, 8)
-                        .frame(width: width - maxX)
+                        .frame(width: minX)
+                    }
+                    HStack(spacing: 4) {
+                        if !sidebarShown { sidebarToggle }
+                        engine
+                    }
+                    .onGeometryChange(for: CGFloat.self) { $0.frame(in: .named(Self.space)).maxX } action: { leadingEnd = $0 }
+                    .generateOnly(generate)
+                    .padding(.leading, sidebarShown ? 12 : Self.trafficLights)
+                    Spacer(minLength: 0)
+                    inspectorToggle.generateOnly(generate).padding(.trailing, 8)
                 }
+                .frame(width: width, height: Self.height)
+                BarTabs(label: "Workspace", selection: $store.workspace, options: AudioWorkspace.allCases) { $0.rawValue }
+                    .fixedSize()
+                    .onGeometryChange(for: CGFloat.self) { $0.size.width } action: { tabsWidth = $0 }
+                    .position(x: tabsCentre(width: width), y: Self.height / 2)
             }
             .frame(width: width, height: Self.height)
+            .coordinateSpace(.named(Self.space))
             // The columns report their final positions at once, so the bar follows them with the
-            // same spring the panes use, and the tabs slide instead of jumping.
+            // same spring the panes use.
             .animation(Motion.page, value: columns)
         }
         .frame(height: Self.height)
         .background { WindowDragArea() }
+    }
+
+    private static let space = "TopBar"
+
+    /// The window's centre, unless the window is too narrow for that: then just clear of the engine
+    /// menu on the left and the inspector toggle on the right.
+    private func tabsCentre(width: CGFloat) -> CGFloat {
+        let half = tabsWidth / 2, gap: CGFloat = 16
+        let lowest = leadingEnd + gap + half
+        let highest = width - 8 - 28 - gap - half
+        return min(max(width / 2, lowest), max(highest, lowest))
     }
 
     private var sidebarToggle: some View {
@@ -93,7 +104,7 @@ struct TopBar: View {
                 ProgressView().controlSize(.mini)
                     .help(store.engineStatus).accessibilityLabel(store.engineStatus)
             } else if store.engineStatus != "Available" {
-                SettingsLink {
+                SettingsButton {
                     Image(systemName: "exclamationmark.circle").font(.system(size: 12))
                         .frame(width: 22, height: 22).contentShape(.rect)
                 }
@@ -106,17 +117,29 @@ struct TopBar: View {
     }
 }
 
-/// Generate, Extract and Transform as small text tabs, with a soft pill behind the current one.
-private struct WorkspaceTabs: View {
-    @Binding var selection: AudioWorkspace
+private extension View {
+    /// Generate's controls stay in place but fade out and stop taking clicks in other workspaces.
+    func generateOnly(_ generate: Bool) -> some View {
+        opacity(generate ? 1 : 0).allowsHitTesting(generate).accessibilityHidden(!generate)
+            .animation(.easeOut(duration: 0.18), value: generate)
+    }
+}
+
+/// Small text tabs with a soft pill behind the current one: the workspaces in the main window,
+/// the panes in Settings.
+struct BarTabs<Value: Hashable>: View {
+    let label: String
+    @Binding var selection: Value
+    let options: [Value]
+    let title: (Value) -> String
     @Namespace private var pill
 
     var body: some View {
         HStack(spacing: 2) {
-            ForEach(AudioWorkspace.allCases) { workspace in
-                let isSelected = selection == workspace
-                Button { withAnimation(Motion.hover) { selection = workspace } } label: {
-                    Text(workspace.rawValue)
+            ForEach(options, id: \.self) { option in
+                let isSelected = selection == option
+                Button { withAnimation(Motion.hover) { selection = option } } label: {
+                    Text(title(option))
                         .font(.system(size: 12, weight: isSelected ? .semibold : .regular))
                         .padding(.horizontal, 10).frame(height: 22)
                         .background {
@@ -130,7 +153,7 @@ private struct WorkspaceTabs: View {
             }
         }
         .accessibilityElement(children: .contain)
-        .accessibilityLabel("Workspace")
+        .accessibilityLabel(label)
     }
 }
 
@@ -171,7 +194,7 @@ private struct BarPressStyle: ButtonStyle {
 }
 
 /// Drags the window, and double-clicks the way the user has chosen for title bars.
-private struct WindowDragArea: View {
+struct WindowDragArea: View {
     var body: some View {
         Color.clear
             .contentShape(.rect)

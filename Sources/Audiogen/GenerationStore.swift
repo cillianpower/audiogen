@@ -45,14 +45,27 @@ import Observation
         default: return pythonEngines[id]!.spec.models
         }
     }
+    /// Whether a model's files are all in place. Checking reads manifests and files from disk, and
+    /// views ask on every redraw (during playback, many times a second), so answers are kept until
+    /// a download settles or models are imported or removed.
     func modelInstalled(_ id: EngineID, model: String) -> Bool {
         _ = downloads.record(id, model: model)?.state
-        switch id {
-        case .ace: return ace.installer.modelInstalled(model)
-        case .miniMax: return miniMax.manifest.presets.first { $0.id == model }.map { miniMax.isInstalled($0) } ?? false
-        default: return pythonEngines[id]!.spec.models.first { $0.id == model }.map { pythonEngines[id]!.isInstalled($0) } ?? false
+        let stamp = [downloads.settledCount, installEpoch]
+        if installCacheStamp != stamp { installCache = [:]; installCacheStamp = stamp }
+        let key = "\(id.rawValue)/\(model)"
+        if let cached = installCache[key] { return cached }
+        let installed = switch id {
+        case .ace: ace.installer.modelInstalled(model)
+        case .miniMax: miniMax.manifest.presets.first { $0.id == model }.map { miniMax.isInstalled($0) } ?? false
+        default: pythonEngines[id]!.spec.models.first { $0.id == model }.map { pythonEngines[id]!.isInstalled($0) } ?? false
         }
+        installCache[key] = installed
+        return installed
     }
+    /// Goes up when models are imported or removed outside a download.
+    private(set) var installEpoch = 0
+    @ObservationIgnored private var installCache: [String: Bool] = [:]
+    @ObservationIgnored private var installCacheStamp: [Int] = []
     func runtimeInstalled(_ id: EngineID) -> Bool {
         _ = downloads.record(id, model: "runtime")?.state
         return switch id { case .ace: ace.installer.runtimeInstalled; case .miniMax: FileManager.default.isExecutableFile(atPath: miniMax.binary.path); default: pythonEngines[id]!.runtimeInstalled }
@@ -242,6 +255,7 @@ import Observation
         if activeID == nil { engineStatus = installed ? "Available" : "Download model in Settings" }
     }
     func refreshACEModels() {
+        installEpoch += 1
         availableACEModels = ACEModel.allCases.filter { model in
             model == .turbo || FileManager.default.fileExists(atPath: paths.models.appendingPathComponent(model.rawValue).appendingPathComponent("config.json").path)
         }

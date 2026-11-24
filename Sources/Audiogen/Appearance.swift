@@ -82,6 +82,11 @@ struct GlassSeam: View {
     var body: some View { Rectangle().fill(.primary.opacity(0.08)).frame(width: 1).accessibilityHidden(true) }
 }
 
+/// The horizontal counterpart of GlassSeam, between rows inside a card.
+struct GlassRule: View {
+    var body: some View { Rectangle().fill(.primary.opacity(0.08)).frame(height: 1).accessibilityHidden(true) }
+}
+
 /// A titled group for the inspector: a small header and its controls directly on the glass.
 struct InspectorSection<Content: View>: View {
     let title: String

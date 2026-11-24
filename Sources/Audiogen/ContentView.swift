@@ -13,22 +13,34 @@ struct ContentView: View {
             TopBar(store: store, sidebar: $sidebar, columns: columns)
         }
         .ignoresSafeArea(.container, edges: .top)
+        // A view left behind keeps keyboard focus, so typing would go to a hidden prompt.
+        .onChange(of: store.workspace) { NSApp.keyWindow?.makeFirstResponder(nil) }
         .toolbar(removing: .title)
         .toolbarBackgroundVisibility(.hidden, for: .windowToolbar)
         .onChange(of: store.activity) { _, activity in DockActivity.update(activity) }
         .windowGlass()
     }
+    /// All three workspaces stay built and switching crossfades between them. Rebuilding the
+    /// split view, waveform and prompt editor on every switch is what made it stutter.
     private var workspace: some View {
-        Group {
-            switch store.workspace {
-            // Generate places the bar's room itself, so the sidebar and inspector can run to the top.
-            case .generate: GenerationWorkspaceView(store: store, sidebar: $sidebar, columns: $columns)
-            case .extract: ProcessingWorkspaceView(store: store, engine: .sam).safeAreaPadding(.top, TopBar.height)
-            case .transform: ProcessingWorkspaceView(store: store, engine: .after).safeAreaPadding(.top, TopBar.height)
-            }
+        ZStack {
+            layer(.generate) { GenerationWorkspaceView(store: store, sidebar: $sidebar, columns: $columns) }
+            layer(.extract) { ProcessingWorkspaceView(store: store, engine: .sam, isActive: store.workspace == .extract).safeAreaPadding(.top, TopBar.height) }
+            layer(.transform) { ProcessingWorkspaceView(store: store, engine: .after, isActive: store.workspace == .transform).safeAreaPadding(.top, TopBar.height) }
         }
-        .transition(.opacity.combined(with: .scale(scale: 0.985)))
-        .animation(Motion.page, value: store.workspace)
+        // Generate needs room for its columns; Extract and Transform for two audio cards side by side.
+        .frame(minWidth: store.workspace == .generate ? (store.inspectorVisible ? GenerationWorkspaceView.minimumWidthWithInspector : 740) : 860, minHeight: 590)
+    }
+
+    private func layer<Content: View>(_ workspace: AudioWorkspace, @ViewBuilder content: () -> Content) -> some View {
+        let isActive = store.workspace == workspace
+        return content()
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .opacity(isActive ? 1 : 0)
+            .allowsHitTesting(isActive)
+            .accessibilityHidden(!isActive)
+            .zIndex(isActive ? 1 : 0)
+            .animation(.easeOut(duration: 0.18), value: isActive)
     }
 }
 
@@ -138,8 +150,7 @@ struct GenerationWorkspaceView: View {
         }
         // Any toggle animates: the bar button, ⌘I or the View menu.
         .animation(Motion.page, value: store.inspectorVisible)
-        // Sidebar, content and inspector minimums; the window widens if the inspector opens in a narrow window.
-        .frame(minWidth: store.inspectorVisible ? Self.minimumWidthWithInspector : 740, minHeight: 590)
+        // The window widens if the inspector opens in a narrow window. ContentView sets the minimums.
         .onChange(of: store.inspectorVisible) { _, visible in
             guard visible, let window = NSApp.windows.first(where: { $0.title == "Audiogen" && $0.isVisible }), window.frame.width < Self.minimumWidthWithInspector else { return }
             var frame = window.frame; frame.size.width = Self.minimumWidthWithInspector
@@ -164,7 +175,7 @@ struct GenerationWorkspaceView: View {
             Text("Welcome to Audiogen").font(.largeTitle.weight(.semibold))
             Text("Local sound design on your Mac. Generate, listen, iterate.").font(.title3).foregroundStyle(.secondary)
             Text("To start, download a model for \(store.engineName) in Settings. Then describe a sound below.")
-            SettingsLink { Label("Runtimes & Downloads…", systemImage: "arrow.down.circle") }.buttonStyle(.glassProminent).controlSize(.large)
+            SettingsButton { Label("Runtimes & Downloads…", systemImage: "arrow.down.circle") }.buttonStyle(.glassProminent).controlSize(.large)
             Text("You can also drop audio here, or choose File › Import Audio…, to add it to your library.").font(.callout).foregroundStyle(.secondary)
         }.frame(maxWidth: 440, alignment: .leading).padding(40).frame(maxWidth: .infinity, maxHeight: .infinity)
     }
@@ -200,11 +211,14 @@ struct GenerationWorkspaceView: View {
                 NativeWaveform(player: store.player).opacity(store.player.url == nil ? 0 : 1)
                 if store.player.loading { ProgressView("Reading audio…") }
                 else if store.player.url == nil {
-                    VStack(spacing: 10) {
-                        Image(systemName: "waveform").font(.system(size: 44, weight: .light)).foregroundStyle(.tertiary)
-                        Text("Describe a sound below to generate it").font(.title3)
-                        Text("Or drop audio here to add it to your library.").foregroundStyle(.secondary)
+                    ChooseOrDropArea(help: "Add audio to your library", action: store.chooseImport) {
+                        VStack(spacing: 10) {
+                            Image(systemName: "waveform").font(.system(size: 44, weight: .light)).foregroundStyle(.tertiary)
+                            Text("Describe a sound below to generate it").font(.title3)
+                            Text("Or drop audio here, or click, to add it to your library.").foregroundStyle(.secondary)
+                        }
                     }
+                    .padding(.horizontal, 20)
                 }
             }.frame(maxWidth: .infinity, maxHeight: .infinity).frame(minHeight: 180)
             if let message = store.player.error { Text(message).font(.caption).foregroundStyle(.red) }
@@ -336,7 +350,6 @@ struct GenerationWorkspaceView: View {
                 InspectorSection("Generation") {
                     inspectorRow("Duration") { Text((store.selectedEngine == .yue ? "Up to " : "") + durationText(store.duration)).foregroundStyle(.secondary) }
                     inspectorRow("Seed") { TextField("Seed", text: $store.seedText, prompt: Text("Random")).labelsHidden() }
-                    HStack { Button("Random") { store.seedText = "" }; Button("Copy Seed") { NSPasteboard.general.clearContents(); NSPasteboard.general.setString(store.seedText, forType: .string) }.disabled(store.seedText.isEmpty) }
                 }
                 InspectorSection("Model") {
                     inspectorRow("Engine") { Text(store.engineName).foregroundStyle(.secondary) }
@@ -346,7 +359,6 @@ struct GenerationWorkspaceView: View {
                         }
                     }.labelsHidden().disabled(!store.canSwitchEngine)
                     Text("\(store.minimumMemoryGB) GB minimum unified memory").font(.caption).foregroundStyle(.secondary)
-                    SettingsLink { Text("Manage Runtimes & Downloads…") }.buttonStyle(.link).font(.callout)
                     if store.selectedEngine == .ace || store.selectedEngine == .stableAudio {
                         Button("Choose LoRA…") { store.chooseLoRA() }
                         if let lora = store.lora {
@@ -379,7 +391,6 @@ struct GenerationWorkspaceView: View {
                     InspectorSection("Selected Audio") {
                         inspectorRow("Imported") { Text(selected.created.formatted(date: .abbreviated, time: .shortened)).foregroundStyle(.secondary) }
                         if let file = selected.audio { Text(file.lastPathComponent).font(.caption).foregroundStyle(.secondary).textSelection(.enabled) }
-                        if store.engine.capabilities.referenceAudio { Button("Use as Reference") { store.reference = selected.audio } }
                     }
                 } else if let selected = store.selected {
                     InspectorSection("Selected Audio") {
