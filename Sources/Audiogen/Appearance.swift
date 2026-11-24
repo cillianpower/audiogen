@@ -1,110 +1,121 @@
 import SwiftUI
+import AppKit
 
-/// Standard follows the Human Interface Guidelines: Liquid Glass for controls and navigation,
-/// standard materials for content. Glass extends Liquid Glass to panels and makes the window
-/// translucent. Both fall back to opaque surfaces when Reduce Transparency is on.
-enum AppAppearance: String, CaseIterable, Identifiable {
-    case standard, glass
-    var id: Self { self }
-    var title: String { self == .standard ? "Standard" : "Glass" }
-    static let key = "appearance"
+// Audiogen has one look: a translucent window that blurs the desktop, with Liquid Glass panels and
+// controls on top. Its colour comes from the wallpaper behind it and the accent colour, never from
+// painted decoration. With Reduce Transparency on, the system makes these materials opaque.
+
+/// Shared motion, so everything moves with the same feel (as in Tuner).
+enum Motion {
+    /// Pointer feedback: quick, with a little bounce.
+    static let hover = Animation.spring(response: 0.28, dampingFraction: 0.72)
+    /// Moving between workspaces.
+    static let page = Animation.spring(response: 0.42, dampingFraction: 0.88)
+    /// Surfaces appearing or changing shape, such as the generation queue.
+    static let morph = Animation.spring(response: 0.56, dampingFraction: 0.84)
 }
 
-/// A content panel: a standard material in Standard, Liquid Glass in Glass.
+/// A content panel in Liquid Glass.
 private struct Panel: ViewModifier {
-    @AppStorage(AppAppearance.key) private var appearance = AppAppearance.standard
     let cornerRadius: CGFloat
     func body(content: Content) -> some View {
-        let shape = RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
-        if appearance == .glass {
-            content.glassEffect(.regular, in: shape)
-        } else {
-            content.background(.background.secondary, in: shape)
-                .overlay(shape.strokeBorder(.separator.opacity(0.6)))
-        }
+        content.glassEffect(.regular, in: RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
     }
 }
 
-/// The content area's background: the system background in Standard; in Glass, a soft tint
-/// over the translucent window that extends beneath the sidebar.
-private struct ContentBackdrop: ViewModifier {
-    @AppStorage(AppAppearance.key) private var appearance = AppAppearance.standard
-    @Environment(\.colorScheme) private var colorScheme
+/// A soft blur that fades out away from an edge, so a bar sits on the glass without a hard line.
+private struct EdgeFade: ViewModifier {
+    let edge: VerticalEdge
     func body(content: Content) -> some View {
-        if appearance == .glass {
-            content.background { AmbientTint(dark: colorScheme == .dark).backgroundExtensionEffect().ignoresSafeArea() }
-        } else {
-            content.background(.background)
+        content.background {
+            Rectangle()
+                .fill(.ultraThinMaterial)
+                .mask {
+                    LinearGradient(stops: [
+                        .init(color: .black.opacity(0.85), location: 0),
+                        .init(color: .black.opacity(0.5), location: 0.6),
+                        .init(color: .clear, location: 1),
+                    ], startPoint: edge == .top ? .top : .bottom, endPoint: edge == .top ? .bottom : .top)
+                }
+                .padding(edge == .top ? .bottom : .top, -14)
+                .allowsHitTesting(false)
         }
-    }
-}
-
-/// In Glass, the window itself is translucent and blurs the desktop behind it.
-private struct WindowMaterial: ViewModifier {
-    @AppStorage(AppAppearance.key) private var appearance = AppAppearance.standard
-    func body(content: Content) -> some View {
-        if appearance == .glass { content.containerBackground(.ultraThinMaterial, for: .window) } else { content }
-    }
-}
-
-/// Grouped forms drop their opaque backing in Glass so the window shows through.
-private struct GlassFormBackground: ViewModifier {
-    @AppStorage(AppAppearance.key) private var appearance = AppAppearance.standard
-    func body(content: Content) -> some View { content.scrollContentBackground(appearance == .glass ? .hidden : .automatic) }
-}
-
-/// A slow, low-contrast colour field that gives the glass something to refract.
-struct AmbientTint: View {
-    let dark: Bool
-    var body: some View {
-        MeshGradient(width: 3, height: 3, points: [
-            [0, 0], [0.5, 0], [1, 0],
-            [0, 0.5], [0.55, 0.45], [1, 0.5],
-            [0, 1], [0.5, 1], [1, 1]
-        ], colors: [
-            .indigo, .purple, .blue,
-            .teal, .indigo, .pink,
-            .blue, .cyan, .purple
-        ]).opacity(dark ? 0.22 : 0.14)
     }
 }
 
 extension View {
     func panel(cornerRadius: CGFloat = 14) -> some View { modifier(Panel(cornerRadius: cornerRadius)) }
-    func contentBackdrop() -> some View { modifier(ContentBackdrop()) }
-    func windowMaterial() -> some View { modifier(WindowMaterial()) }
-    func glassFormBackground() -> some View { modifier(GlassFormBackground()) }
-    func inspectorBackdrop() -> some View { modifier(InspectorBackdrop()) }
-    func barBackdrop() -> some View { modifier(BarBackdrop()) }
+    /// The window is translucent and blurs the desktop behind it.
+    func windowGlass() -> some View {
+        containerBackground(for: .window) { WindowBlur() }
+    }
+    /// Grouped forms and lists drop their opaque backing so the window shows through.
+    func clearScrollBackground() -> some View { scrollContentBackground(.hidden) }
+    /// A bar pinned to the top or bottom edge of a column.
+    func edgeFade(_ edge: VerticalEdge) -> some View { modifier(EdgeFade(edge: edge)) }
 }
 
-/// Settings → General and View menu control.
-struct AppearancePicker: View {
-    @AppStorage(AppAppearance.key) private var appearance = AppAppearance.standard
-    var title = "Appearance"
+/// A behind-window blur that stays live when the window is in the background. SwiftUI's window
+/// materials follow the window's active state, so an inactive window turned flat grey.
+private struct WindowBlur: NSViewRepresentable {
+    /// Clears the window's own backing once attached, so the blur shows the desktop, not grey.
+    final class BlurView: NSVisualEffectView {
+        override func viewDidMoveToWindow() {
+            super.viewDidMoveToWindow()
+            guard let window else { return }
+            window.isOpaque = false
+            window.backgroundColor = .clear
+        }
+    }
+    func makeNSView(context: Context) -> NSVisualEffectView {
+        let view = BlurView()
+        view.blendingMode = .behindWindow
+        view.material = .underWindowBackground
+        view.state = .active
+        return view
+    }
+    func updateNSView(_ view: NSVisualEffectView, context: Context) {}
+}
+
+/// A hairline between columns, faint enough to read as a fold in the glass rather than a rule.
+struct GlassSeam: View {
+    var body: some View { Rectangle().fill(.primary.opacity(0.08)).frame(width: 1).accessibilityHidden(true) }
+}
+
+/// A titled group for the inspector: a small header and its controls directly on the glass.
+struct InspectorSection<Content: View>: View {
+    let title: String
+    @ViewBuilder let content: () -> Content
+    init(_ title: String, @ViewBuilder content: @escaping () -> Content) { self.title = title; self.content = content }
     var body: some View {
-        Picker(title, selection: $appearance) { ForEach(AppAppearance.allCases) { Text($0.title).tag($0) } }
+        VStack(alignment: .leading, spacing: 8) {
+            Text(title).font(.caption.weight(.semibold)).foregroundStyle(.secondary).accessibilityAddTraits(.isHeader)
+            content()
+        }.frame(maxWidth: .infinity, alignment: .leading)
     }
 }
-struct GlassAppearanceToggle: View {
-    @AppStorage(AppAppearance.key) private var appearance = AppAppearance.standard
+
+/// The little equalizer on the row that's playing. It rests when paused.
+struct PlayingBars: View {
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    let isPlaying: Bool
+
     var body: some View {
-        Toggle("Glass Appearance", isOn: Binding(get: { appearance == .glass }, set: { appearance = $0 ? .glass : .standard }))
+        TimelineView(.animation(minimumInterval: 1 / 24, paused: !isPlaying || reduceMotion)) { context in
+            let t = context.date.timeIntervalSinceReferenceDate.truncatingRemainder(dividingBy: 3600)
+            HStack(alignment: .bottom, spacing: 2) {
+                ForEach(0..<4, id: \.self) { i in
+                    Capsule().frame(width: 2, height: height(i, t))
+                }
+            }
+            .frame(height: 11, alignment: .bottom)
+        }
+        .foregroundStyle(.tint)
+        .accessibilityLabel(isPlaying ? "Playing" : "Paused")
     }
-}
 
-/// The inspector column: the window background in Standard; clear in Glass, over the window's material.
-private struct InspectorBackdrop: ViewModifier {
-    @AppStorage(AppAppearance.key) private var appearance = AppAppearance.standard
-    func body(content: Content) -> some View {
-        if appearance == .glass { content } else { content.background(.background) }
-    }
-}
-
-/// Small bars inside a column, such as the sidebar's filter bar.
-private struct BarBackdrop: ViewModifier {
-    @AppStorage(AppAppearance.key) private var appearance = AppAppearance.standard
-    func body(content: Content) -> some View {
-        if appearance == .glass { content.background(.ultraThinMaterial) } else { content.background(.bar) }
+    private func height(_ bar: Int, _ time: TimeInterval) -> CGFloat {
+        guard isPlaying, !reduceMotion else { return 3 + CGFloat(bar % 2) * 2 }
+        return 3 + 8 * abs(sin(time * (2.1 + Double(bar) * 0.7) + Double(bar) * 1.3))
     }
 }

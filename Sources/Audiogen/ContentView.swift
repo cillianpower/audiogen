@@ -3,30 +3,39 @@ import UniformTypeIdentifiers
 
 struct ContentView: View {
     @Bindable var store: GenerationStore
+    @State private var sidebar = NavigationSplitViewVisibility.all
+    @State private var columns = BarColumns()
     var body: some View {
+        // The bar floats over the content in the title bar's place, beside the traffic lights. The
+        // sidebar runs the full height beneath it, as in Stereo, and everything else starts below it.
+        ZStack(alignment: .top) {
+            workspace.frame(maxWidth: .infinity, maxHeight: .infinity)
+            TopBar(store: store, sidebar: $sidebar, columns: columns)
+        }
+        .ignoresSafeArea(.container, edges: .top)
+        .toolbar(removing: .title)
+        .toolbarBackgroundVisibility(.hidden, for: .windowToolbar)
+        .onChange(of: store.activity) { _, activity in DockActivity.update(activity) }
+        .windowGlass()
+    }
+    private var workspace: some View {
         Group {
             switch store.workspace {
-            case .generate: GenerationWorkspaceView(store: store)
-            case .extract: ProcessingWorkspaceView(store: store, engine: .sam)
-            case .transform: ProcessingWorkspaceView(store: store, engine: .after)
+            // Generate places the bar's room itself, so the sidebar and inspector can run to the top.
+            case .generate: GenerationWorkspaceView(store: store, sidebar: $sidebar, columns: $columns)
+            case .extract: ProcessingWorkspaceView(store: store, engine: .sam).safeAreaPadding(.top, TopBar.height)
+            case .transform: ProcessingWorkspaceView(store: store, engine: .after).safeAreaPadding(.top, TopBar.height)
             }
         }
-        .toolbar {
-            ToolbarItem(placement: .principal) {
-                Picker("Workspace", selection: $store.workspace) {
-                    ForEach(AudioWorkspace.allCases) { Text($0.rawValue).tag($0) }
-                }.pickerStyle(.segmented).labelsHidden().fixedSize()
-            }
-        }
-        .onChange(of: store.activity) { _, activity in DockActivity.update(activity) }
-        // The workspace switcher says where you are; the app name adds nothing (HIG: Toolbars).
-        .toolbar(removing: .title)
-        .windowMaterial()
+        .transition(.opacity.combined(with: .scale(scale: 0.985)))
+        .animation(Motion.page, value: store.workspace)
     }
 }
 
 struct GenerationWorkspaceView: View {
     @Bindable var store: GenerationStore
+    @Binding var sidebar: NavigationSplitViewVisibility
+    @Binding var columns: BarColumns
     @State private var renameID: UUID?
     @State private var renameText = ""
     @State private var showAdvanced = false
@@ -36,7 +45,7 @@ struct GenerationWorkspaceView: View {
     @State private var composerWidth: CGFloat = .infinity
     var body: some View {
         HStack(spacing: 0) {
-        NavigationSplitView {
+        NavigationSplitView(columnVisibility: $sidebar) {
             List(selection: $store.selectedID) {
                 Section {
                     if store.visibleGenerations.isEmpty && store.isFiltering {
@@ -45,6 +54,7 @@ struct GenerationWorkspaceView: View {
                     ForEach(store.visibleGenerations) { item in
                         VStack(alignment: .leading, spacing: 4) {
                             HStack(spacing: 4) {
+                                if let audio = item.audio, store.player.url == audio { PlayingBars(isPlaying: store.player.isPlaying).padding(.trailing, 2) }
                                 Text(item.name).lineLimit(1)
                                 if item.isStarred { Image(systemName: "star.fill").font(.caption2).foregroundStyle(.yellow).accessibilityLabel("Starred") }
                             }
@@ -95,41 +105,39 @@ struct GenerationWorkspaceView: View {
                     }.labelsHidden().pickerStyle(.menu).buttonStyle(.borderless).fixedSize().help("Show audio from one engine, or imported audio")
                     Spacer(minLength: 0)
                 }.font(.callout).padding(.horizontal, 14).padding(.vertical, 8)
-                .barBackdrop().overlay(alignment: .top) { Divider() }
+                .edgeFade(.bottom)
             }
             .navigationSplitViewColumnWidth(min: 220, ideal: 250, max: 340)
+            .toolbar(removing: .sidebarToggle)
         } detail: {
             VStack(spacing: 0) {
                 Group { if !store.installed && store.player.url == nil { onboarding } else { player } }
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                     .audioDropZone("Add to Library") { store.importAudio($0); return true }
-                if store.showQueue, !store.jobs.isEmpty { queue }
+                if store.showQueue, !store.jobs.isEmpty { queue.transition(.move(edge: .bottom).combined(with: .opacity)) }
                 composer
             }
             .frame(minWidth: 480, maxWidth: .infinity, maxHeight: .infinity)
+            .animation(Motion.morph, value: store.showQueue && !store.jobs.isEmpty)
+            .onGeometryChange(for: BarColumns.self) { proxy in
+                let frame = proxy.frame(in: .global)
+                return BarColumns(detailMinX: frame.minX, detailMaxX: frame.maxX)
+            } action: { columns = $0 }
         }
+        // Content starts below the bar; the sidebar's glass still runs to the top of the window.
+        .safeAreaPadding(.top, TopBar.height)
         if store.inspectorVisible {
-            Divider()
-            inspector.frame(width: 270).inspectorBackdrop()
-        }
-        }
-        .contentBackdrop()
-        .toolbar {
-            ToolbarItem(placement: .navigation) {
-                HStack(spacing: 8) {
-                    Picker("Engine", selection: Binding(get: { store.selectedEngine }, set: store.selectEngine)) {
-                        ForEach(EngineID.generationCases) { Text($0.name).tag($0) }
-                    }.labelsHidden().pickerStyle(.menu).fixedSize().disabled(!store.canSwitchEngine).help("Generation engine")
-                    if store.engineBusy || store.engineStatus != "Available" {
-                        if store.engineBusy { ProgressView().controlSize(.small) }
-                        Text(store.engineStatus).font(.caption).foregroundStyle(.secondary).lineLimit(1).truncationMode(.tail).frame(maxWidth: 180, alignment: .leading)
-                    }
-                }
+            // Runs to the top of the window, like the sidebar, with its toggle in the bar above it.
+            // It slides in from the right edge as the main column makes room.
+            HStack(spacing: 0) {
+                GlassSeam()
+                inspector.frame(width: 270)
             }
-            ToolbarItem(placement: .primaryAction) {
-                Button { store.inspectorVisible.toggle() } label: { Label("Inspector", systemImage: "sidebar.trailing") }.help("Show or hide the inspector (⌘I)")
-            }
+            .transition(.move(edge: .trailing).combined(with: .opacity))
         }
+        }
+        // Any toggle animates: the bar button, ⌘I or the View menu.
+        .animation(Motion.page, value: store.inspectorVisible)
         // Sidebar, content and inspector minimums; the window widens if the inspector opens in a narrow window.
         .frame(minWidth: store.inspectorVisible ? Self.minimumWidthWithInspector : 740, minHeight: 590)
         .onChange(of: store.inspectorVisible) { _, visible in
@@ -186,7 +194,7 @@ struct GenerationWorkspaceView: View {
                             }
                         }
                     }.fixedSize()
-                }.padding(.horizontal, 28).padding(.top, 22)
+                }.padding(.horizontal, 28).padding(.top, 10)
             }
             ZStack {
                 NativeWaveform(player: store.player).opacity(store.player.url == nil ? 0 : 1)
@@ -321,65 +329,74 @@ struct GenerationWorkspaceView: View {
         Button { store.generate() } label: { Label("Generate", systemImage: "sparkles") }
             .buttonStyle(.glassProminent).controlSize(.large).disabled(!store.canGenerate).help("Generate (⌘↩)")
     }
+    /// Plain sections directly on the glass, like Xcode's inspectors, rather than grouped-form cards.
     private var inspector: some View {
-        Form {
-            Section("Generation") {
-                LabeledContent("Duration") { Text((store.selectedEngine == .yue ? "Up to " : "") + durationText(store.duration)) }
-                TextField("Seed", text: $store.seedText, prompt: Text("Random"))
-                HStack { Button("Random") { store.seedText = "" }; Button("Copy Seed") { NSPasteboard.general.clearContents(); NSPasteboard.general.setString(store.seedText, forType: .string) }.disabled(store.seedText.isEmpty) }
-            }
-            Section("Model") {
-                LabeledContent("Engine", value: store.engineName)
-                Picker("Model", selection: Binding(get: { store.modelID }, set: store.selectModel)) {
-                    ForEach(store.models(for: store.selectedEngine)) { model in
-                        Text(model.name + (store.modelInstalled(store.selectedEngine, model: model.id) ? "" : " · Not downloaded")).tag(model.id)
+        ScrollView {
+            VStack(alignment: .leading, spacing: 22) {
+                InspectorSection("Generation") {
+                    inspectorRow("Duration") { Text((store.selectedEngine == .yue ? "Up to " : "") + durationText(store.duration)).foregroundStyle(.secondary) }
+                    inspectorRow("Seed") { TextField("Seed", text: $store.seedText, prompt: Text("Random")).labelsHidden() }
+                    HStack { Button("Random") { store.seedText = "" }; Button("Copy Seed") { NSPasteboard.general.clearContents(); NSPasteboard.general.setString(store.seedText, forType: .string) }.disabled(store.seedText.isEmpty) }
+                }
+                InspectorSection("Model") {
+                    inspectorRow("Engine") { Text(store.engineName).foregroundStyle(.secondary) }
+                    Picker("Model", selection: Binding(get: { store.modelID }, set: store.selectModel)) {
+                        ForEach(store.models(for: store.selectedEngine)) { model in
+                            Text(model.name + (store.modelInstalled(store.selectedEngine, model: model.id) ? "" : " · Not downloaded")).tag(model.id)
+                        }
+                    }.labelsHidden().disabled(!store.canSwitchEngine)
+                    Text("\(store.minimumMemoryGB) GB minimum unified memory").font(.caption).foregroundStyle(.secondary)
+                    SettingsLink { Text("Manage Runtimes & Downloads…") }.buttonStyle(.link).font(.callout)
+                    if store.selectedEngine == .ace || store.selectedEngine == .stableAudio {
+                        Button("Choose LoRA…") { store.chooseLoRA() }
+                        if let lora = store.lora {
+                            Text(lora.lastPathComponent).font(.caption).lineLimit(2)
+                            Slider(value: $store.loraScale, in: 0...1)
+                            Text("Strength: \(store.loraScale, specifier: "%.2f")").font(.caption)
+                            Button("Remove LoRA") { store.clearLoRA() }
+                            Text("Choose an adapter trained for this model.").font(.caption).foregroundStyle(.secondary)
+                        }
                     }
-                }.disabled(!store.canSwitchEngine)
-                SettingsLink { Text("Manage Runtimes & Downloads…") }
-                if store.selectedEngine == .ace || store.selectedEngine == .stableAudio {
-                    Button("Choose LoRA…") { store.chooseLoRA() }
-                    if let lora = store.lora {
-                        Text(lora.lastPathComponent).font(.caption).lineLimit(2)
-                        Slider(value: $store.loraScale, in: 0...1)
-                        Text("Strength: \(store.loraScale, specifier: "%.2f")").font(.caption)
-                        Button("Remove LoRA") { store.clearLoRA() }
-                        Text("Choose an adapter trained for this model.").font(.caption).foregroundStyle(.secondary)
+                }
+                if store.engine.capabilities.lyrics {
+                    InspectorSection("Lyrics") { TextField("Optional lyrics", text: $store.lyrics, axis: .vertical).lineLimit(3...8).labelsHidden() }
+                }
+                InspectorSection("Conditioning") {
+                    Toggle("Instrumental", isOn: $store.instrumental)
+                    Toggle("No percussion", isOn: $store.noPercussion)
+                    Toggle("No vocals", isOn: $store.noVocals)
+                    TextField("Avoid", text: $store.avoid, prompt: Text("Avoid…"), axis: .vertical).lineLimit(2...4).labelsHidden()
+                    if store.engine.capabilities.referenceAudio {
+                        inspectorRow("Reference strength") { Text(store.referenceStrength, format: .number.precision(.fractionLength(1))).monospacedDigit().foregroundStyle(.secondary) }
+                        Slider(value: $store.referenceStrength, in: 0...1)
+                    }
+                    Text("Constraints are applied to backend conditioning. Results may still contain unwanted sounds.").font(.caption).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
+                }
+                ClickableDisclosure("Advanced", isExpanded: $showAdvanced) {
+                    Stepper("Steps: \(store.steps)", value: $store.steps, in: store.selectedEngine == .miniMax ? 2...100 : 1...100).padding(.top, 6)
+                }.font(.caption.weight(.semibold)).foregroundStyle(.secondary)
+                if let selected = store.selected, selected.isImported {
+                    InspectorSection("Selected Audio") {
+                        inspectorRow("Imported") { Text(selected.created.formatted(date: .abbreviated, time: .shortened)).foregroundStyle(.secondary) }
+                        if let file = selected.audio { Text(file.lastPathComponent).font(.caption).foregroundStyle(.secondary).textSelection(.enabled) }
+                        if store.engine.capabilities.referenceAudio { Button("Use as Reference") { store.reference = selected.audio } }
+                    }
+                } else if let selected = store.selected {
+                    InspectorSection("Selected Audio") {
+                        Text(selected.created, format: .dateTime.month().day().hour().minute()).foregroundStyle(.secondary)
+                        Text("Seed \(selected.request.seed)").textSelection(.enabled)
+                        if let message = selected.error { Text(message).font(.caption).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true) }
+                        Button("Restore Settings") { store.duplicateSettings(selected) }
                     }
                 }
-                Text("\(store.minimumMemoryGB) GB minimum unified memory").font(.caption).foregroundStyle(.secondary)
             }
-            if store.engine.capabilities.lyrics {
-                Section("Lyrics") { TextField("Optional lyrics", text: $store.lyrics, axis: .vertical).lineLimit(3...8) }
-            }
-            Section("Conditioning") {
-                Toggle("Instrumental", isOn: $store.instrumental)
-                Toggle("No percussion", isOn: $store.noPercussion)
-                Toggle("No vocals", isOn: $store.noVocals)
-                TextField("Avoid", text: $store.avoid, axis: .vertical).lineLimit(2...4)
-                if store.engine.capabilities.referenceAudio {
-                    LabeledContent("Reference strength") { Text(store.referenceStrength, format: .number.precision(.fractionLength(1))) }
-                    Slider(value: $store.referenceStrength, in: 0...1)
-                }
-                Text("Constraints are applied to backend conditioning. Results may still contain unwanted sounds.").font(.caption).foregroundStyle(.secondary)
-            }
-            ClickableDisclosure("Advanced", isExpanded: $showAdvanced) {
-                Stepper("Steps: \(store.steps)", value: $store.steps, in: store.selectedEngine == .miniMax ? 2...100 : 1...100)
-            }
-            if let selected = store.selected, selected.isImported {
-                Section("Selected Audio") {
-                    LabeledContent("Imported", value: selected.created.formatted(date: .abbreviated, time: .shortened))
-                    if let file = selected.audio { Text(file.lastPathComponent).font(.caption).foregroundStyle(.secondary).textSelection(.enabled) }
-                    if store.engine.capabilities.referenceAudio { Button("Use as Reference") { store.reference = selected.audio } }
-                }
-            } else if let selected = store.selected {
-                Section("Selected Audio") {
-                    Text(selected.created, format: .dateTime.month().day().hour().minute()).foregroundStyle(.secondary)
-                    Text("Seed \(selected.request.seed)").textSelection(.enabled)
-                    if let message = selected.error { Text(message).font(.caption).foregroundStyle(.secondary) }
-                    Button("Restore Settings") { store.duplicateSettings(selected) }
-                }
-            }
-        }.formStyle(.grouped).glassFormBackground()
+            .textFieldStyle(.roundedBorder)
+            .padding(.horizontal, 16).padding(.vertical, 14)
+        }
+        .safeAreaPadding(.top, TopBar.height)
+    }
+    private func inspectorRow<Value: View>(_ title: String, @ViewBuilder value: () -> Value) -> some View {
+        HStack(spacing: 8) { Text(title); Spacer(minLength: 8); value() }
     }
 }
 

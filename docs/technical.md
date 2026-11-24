@@ -20,7 +20,7 @@ For ACE-Step, the app downloads a verified installer binary and self-contained P
 
 ## Implemented in 0.4
 
-Later additions (takes, short Stable Audio/MusicGen durations, search and stars, export options, Send To, drop-to-import, region drag-out, stereo Extract/Transform, undo, Standard/Glass appearance) are described in the README.
+Later additions (takes, short Stable Audio/MusicGen durations, search and stars, export options, Send To, drop-to-import, region drag-out, stereo Extract/Transform, undo, the glass window) are described in the README.
 
 
 - Native sidebar, waveform player, bottom prompt composer and collapsible inspector.

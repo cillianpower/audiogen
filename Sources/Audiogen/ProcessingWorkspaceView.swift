@@ -143,7 +143,6 @@ struct ProcessingWorkspaceView: View {
                 }
             }.padding(28).frame(maxWidth: 1100).frame(maxWidth: .infinity)
         }
-        .contentBackdrop()
         .frame(minWidth: 860, minHeight: 590)
         .alert("Audio Processing", isPresented: Binding(get: { processing.error != nil }, set: { if !$0 { processing.error = nil } })) {
             Button("Show Logs") { processing.reveal(store.paths.logs) }

@@ -8,10 +8,19 @@ import AppKit
 @main struct AudiogenApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) private var delegate
     @State private var store = GenerationStore()
+    init() {
+        // Every view shares one store, so a second window would only mirror the first. AppKit's
+        // window restoration brought back every window a Dock reopen had ever added, and the tab
+        // bar's + button made more, so launch opens exactly one window and tabs are off.
+        UserDefaults.standard.register(defaults: ["ApplePersistenceIgnoreState": true])
+        NSWindow.allowsAutomaticWindowTabbing = false
+    }
     var body: some Scene {
         WindowGroup("Audiogen") {
             ContentView(store: store).onAppear { delegate.attach(store); delegate.installKeyboardMonitor() }
         }.defaultSize(width: 1140, height: 730)
+        // The window's controls live in TopBar, a slim strip beside the traffic lights.
+        .windowStyle(.hiddenTitleBar)
         .commands {
             CommandGroup(replacing: .newItem) {
                 Button(store.workspace == .generate ? "Import Audio…" : "Import Source Audio…") {
@@ -49,7 +58,6 @@ import AppKit
             }
             CommandGroup(after: .sidebar) {
                 Button("Toggle Inspector") { store.inspectorVisible.toggle() }.keyboardShortcut("i")
-                GlassAppearanceToggle()
                 Button("Show Queue") { store.showQueue.toggle() }
             }
         }
@@ -120,15 +128,10 @@ struct EngineSettings: View {
                     }.padding(.bottom, 4)
                     ForEach(EngineID.allCases) { id in runtimeCard(id) }
                 }.padding(24)
-            }.contentBackdrop()
+            }
                 .tabItem { Label("Runtimes", systemImage: "cpu") }
 
             Form {
-                Section("Appearance") {
-                    AppearancePicker(title: "Style").pickerStyle(.segmented)
-                    Text("Standard follows macOS: Liquid Glass for controls, solid panels for content. Glass makes the window translucent and turns panels into Liquid Glass. Both become solid when Reduce Transparency is on in Accessibility settings.")
-                        .font(.caption).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
-                }
                 Section("Audio Library") {
                     LabeledContent("Save audio to") {
                         Text(store.outputDirectory.path).textSelection(.enabled)
@@ -143,9 +146,9 @@ struct EngineSettings: View {
                         Button("Show in Finder") { store.reveal(store.paths.logs) }
                     }
                 }
-            }.formStyle(.grouped).glassFormBackground().contentBackdrop().tabItem { Label("General", systemImage: "gearshape") }
+            }.formStyle(.grouped).clearScrollBackground().tabItem { Label("General", systemImage: "gearshape") }
         }.frame(width: 700, height: 650)
-        .windowMaterial()
+        .windowGlass()
         .confirmationDialog("Uninstall \(uninstallTarget?.name ?? "runtime") and its model files? Generated audio will be kept.", isPresented: Binding(get: { uninstallTarget != nil }, set: { if !$0 { uninstallTarget = nil } })) {
             if let target = uninstallTarget {
                 Button("Uninstall", role: .destructive) { store.uninstall(target); uninstallTarget = nil }
